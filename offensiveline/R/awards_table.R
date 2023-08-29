@@ -1,115 +1,148 @@
 ##### Data Setup #####
-# Load necessary libraries
-library(tidyverse)
-library(sleeperapi)
-library(dplyr)
-source('sleeper-etl.R')
+#' Title Find the Top Player at a Position in a Week
+#'
+#' @param pos Position to look for
+#' @param data player data
+#' @param current_week Week to look at
+#'
+#' @return
+#' @export
+#'
+#' @examples find_top_player("QB", player_data, 2)
+find_top_player <- function(pos, data, current_week) {
+  result <- data %>%
+    filter(position == pos & starter_id == 1) %>%
+    mutate(rank = rank(-points)) %>%
+    filter(week == current_week) %>%
+    slice_max(order_by = points)
 
-# Define the league ID and current week
-league_id <- 968890022248103936
-current_week <- 2
-current_year <- 2023
+  player_name <- result$full_name
+  manager <- result$team_name
+  player_points <- result$points
+  player_rank <- result$rank
 
-# Retrieve league details using the Sleeper API
-league <- get_league(league_id)
+  return(list(player_name = player_name,
+              manager = manager,
+              player_points = player_points,
+              player_rank = player_rank))
+}
 
-# Get the previous league ID for this league
-league_id_2 <- league$previous_league_id
+#' Title Create the Top Player Award
+#'
+#' @param pos position for award
+#' @param data player data
+#' @param current_week week of award
+#' @param award_name what to name the award
+#'
+#' @return
+#' @export
+#'
+#' @examples top_player_award("QB", player_data, 2, "Anti-Russ")
+top_player_award <- function(pos, data, current_week, award_name) {
+  top_player <- find_top_player(pos, data, current_week)
 
-# get all player data for each matchup
-all_players <- get_matchup_data_data(current_week,league_id_2)
+  award_text <- c(
+    award_name,
+    sprintf(
+      '%s played %s - %s points (#%s this season)',
+      paste(top_player$manager, collapse = " and "),
+      paste(top_player$player_name, collapse = " and "),
+      top_player$player_points,
+      top_player$player_rank
+    )
+  )
 
-# summarize to the team level
-all_matchups <- get_team_matchups(all_players)
+  return(award_text)
+}
 
 create_awards_table <- function(player_data, matchup_data) {
   ##### Awards Table #####
   ###### Best and Worst Managers ######
   # find the best manager and points scored
-  best_manager <- matchup_data %>% 
+  best_manager <- matchup_data %>%
     mutate(team_points_rank = rank(-team_points)) %>%
-    filter(week == current_week) %>% 
+    filter(week == current_week) %>%
     slice_max(order_by = team_points)
-  
+
   best_manager_desc <- sprintf(
     '%s - %s points (#%s this season)',
     best_manager$team_name,
     best_manager$team_points,
     best_manager$team_points_rank
   )
-  
+
   awards <- data.frame(
     "Superlative" = "Best Managed Team",
     "Description" = best_manager_desc
   )
-  
+
   # rename the columns of the table to be what is desired
   # can't do Winner + Description because + isn't allowed
   names(awards) <- c("Superlative", "Winner + Description")
-  
+
   # find the worst manager and points scored
-  worst_manager <- matchup_data %>% 
+  worst_manager <- matchup_data %>%
     mutate(team_points_rank = rank(team_points)) %>%
-    filter(week == current_week) %>% 
+    filter(week == current_week) %>%
     slice_max(order_by = -team_points)
-  
+
   worst_manager_desc <- sprintf(
     '%s - %s points (#%s this season)',
     worst_manager$team_name,
     worst_manager$team_points,
     worst_manager$team_points_rank
   )
-  
+
   awards <- rbind(awards, c(
     "Superlative" = "Most Mismanaged Team",
     "Winner + Description" = worst_manager_desc
   ))
-  
+
   ###### Best Players ######
   # find the best QB this week
-  awards <- rbind(awards, 
-                  top_player_award(pos = "QB", 
+  awards <- rbind(awards,
+                  top_player_award(pos = "QB",
                                    data = player_data,
                                    current_week = current_week,
                                    award_name = "Anti-Russ"))
-  
+
   # find the best RB this week
-  awards <- rbind(awards, 
-                  top_player_award(pos = "RB", 
-                                   data = player_data, 
+  awards <- rbind(awards,
+                  top_player_award(pos = "RB",
+                                   data = player_data,
                                    current_week = current_week,
                                    award_name = "Running Wild"))
-  
+
   # find the best WR this week
-  awards <- rbind(awards, 
-                  top_player_award(pos = "WR", 
-                                   data = player_data, 
+  awards <- rbind(awards,
+                  top_player_award(pos = "WR",
+                                   data = player_data,
                                    current_week = current_week,
                                    award_name = "Widest Receiver"))
-  
+
   # find the best TE this week
-  awards <- rbind(awards, 
-                  top_player_award(pos = "TE", 
-                                   data = player_data, 
+  awards <- rbind(awards,
+                  top_player_award(pos = "TE",
+                                   data = player_data,
                                    current_week = current_week,
                                    award_name = "Tighest End"))
-  
-  
+
+
   # # find the best K this week
-  # awards <- rbind(awards, 
-  #                 top_player_award(pos = "K", 
-  #                                  data = player_data, 
+  # awards <- rbind(awards,
+  #                 top_player_award(pos = "K",
+  #                                  data = player_data,
   # current_week = current_week,
   #                                  award_name = "Das Boot"))
-  # 
-  # 
+  #
+  #
   # # find the best DEF this week
-  # awards <- rbind(awards, 
-  #                 top_player_award(pos = "DEF", 
-  #                                  data = player_data, 
+  # awards <- rbind(awards,
+  #                 top_player_award(pos = "DEF",
+  #                                  data = player_data,
   # current_week = current_week,
   #                                  award_name = "Biggest D"))
-  
+
   ###### MVP Award ######
   # get MVP data and award entry
   mvp_data <- player_data %>%
@@ -118,71 +151,71 @@ create_awards_table <- function(player_data, matchup_data) {
     arrange(-percent_output) %>%
     mutate(mvp_rank = rank(-percent_output, ties.method = "min")) %>%
     filter(week == current_week)
-  
+
   best_player <- mvp_data[which.max(mvp_data$percent_output), ]
-  
+
   mvp_desc <- sprintf('%s played %s - %s%% of points (#%s this season)',
                       best_player$team_name,
                       best_player$full_name,
                       max(best_player$percent_output),
                       best_player$mvp_rank
                       )
-  
+
   awards <- rbind(awards, c(
     "Superlative" = "MVP",
     "Winner + Description" = mvp_desc
   ))
-  
+
   ###### Worst Winner and Best Loser ######
   # find the worst winner and points scored
-  worst_winner <- matchup_data %>% 
+  worst_winner <- matchup_data %>%
     filter(winner == 1) %>%
     mutate(team_points_rank = rank(team_points)) %>%
-    filter(week == current_week) %>% 
+    filter(week == current_week) %>%
     slice_max(order_by = -team_points)
-  
+
   worst_winner_desc <- sprintf(
     '%s - %s points (#%s this season)',
     worst_winner$team_name,
     worst_winner$team_points,
     worst_winner$team_points_rank
   )
-  
+
   awards <- rbind(awards, c(
     "Superlative" = "Worst Winner",
     "Winner + Description" = worst_winner_desc
   ))
-  
+
   # find the worst winner and points scored
-  best_loser <- matchup_data %>% 
+  best_loser <- matchup_data %>%
     filter(winner != 1) %>%
     mutate(team_points_rank = rank(-team_points)) %>%
-    filter(week == current_week) %>% 
+    filter(week == current_week) %>%
     slice_max(order_by = team_points)
-  
+
   best_loser_desc <- sprintf(
     '%s - %s points (#%s this season)',
     best_loser$team_name,
     best_loser$team_points,
     best_loser$team_points_rank
   )
-  
+
   awards <- rbind(awards, c(
     "Superlative" = "Best Loser",
     "Winner + Description" = best_loser_desc
   ))
-  
+
   ###### Biggest Blowout and Closest Game ######
   game_margins <- matchup_data %>% group_by(week, matchup_id) %>%
     mutate(game_margin = team_points[winner == 1] - team_points[winner == 0]) %>%
     ungroup() %>%
-    mutate(blowout_rank = dense_rank(-game_margin), 
+    mutate(blowout_rank = dense_rank(-game_margin),
            closest_rank = dense_rank(game_margin))
-  
+
   biggest_blowout <- game_margins %>%
     filter(week == current_week) %>%
     slice_max(order_by = game_margin)
-  
+
   biggest_blowout_desc <- sprintf(
     '%s defeated %s by %s points (#%s this season)',
     biggest_blowout$team_name[biggest_blowout$winner == 1],
@@ -190,16 +223,16 @@ create_awards_table <- function(player_data, matchup_data) {
     max(biggest_blowout$game_margin),
     max(biggest_blowout$blowout_rank)
   )
-  
+
   awards <-  rbind(awards, c(
     "Superlative" = "Deadest Horse",
     "Winner + Description" = biggest_blowout_desc
   ))
-  
+
   closest_game <- game_margins %>%
     filter(week == current_week) %>%
     slice_max(order_by = -game_margin)
-  
+
   closest_game_desc <- sprintf(
     '%s defeated %s by %s points (#%s this season)',
     closest_game$team_name[closest_game$winner == 1],
@@ -207,16 +240,16 @@ create_awards_table <- function(player_data, matchup_data) {
     max(closest_game$game_margin),
     max(closest_game$closest_rank)
   )
-  
+
   awards <-  rbind(awards, c(
     "Superlative" = "Photo Finish",
     "Winner + Description" = closest_game_desc
   ))
-  
+
   ###### Best and Worst Benches - Leave this for once we have lineup info ######
-  # optimal_lineups <- calc_optimal_lineups(player_data) 
-  # 
-  # 
+  # optimal_lineups <- calc_optimal_lineups(player_data)
+  #
+  #
   # awards <- rbind(awards, c(
   #   'Best Benchwarmers',
   #   paste0(
@@ -229,12 +262,12 @@ create_awards_table <- function(player_data, matchup_data) {
   #     ' this season)'
   #   )
   # ))
-  # 
+  #
   # low_depth_managers <- last_week_optimize_scores$manager[which(
   #   last_week_optimize_scores$Points.on.Bench ==
   #     min(last_week_optimize_scores$Points.on.Bench)
   # )]
-  # 
+  #
   # awards <- rbind(awards, c(
   #   'Least Depth',
   #   paste0(
