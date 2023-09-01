@@ -52,3 +52,28 @@ scoring_dist <- create_scoring_dist(
 weekly_scores <-
   create_weekly_scoring_chart(matchup_data = all_matchups,
                               max_week = current_week)
+
+# create leaderboard
+leaderboard <- create_leaderboard(matchup_data = all_matchups,
+                                  max_week = current_week)
+
+# create power rankings
+power_rankings <- create_power_rankings(matchup_data = all_matchups,
+                                        max_week = current_week,
+                                        number_of_teams = length(unique(all_matchups$manager_id)))
+
+# testing for power rankings
+number_of_teams <- 8
+
+test <- all_matchups %>%
+  group_by(week) %>%
+  arrange(desc(team_points)) %>%
+  mutate(points_rank = row_number()) %>%
+  mutate(other_team_points_rank = ifelse(
+    manager_id == unique(manager_id)[1],
+    lead(points_rank, order_by = manager_id),
+    lag(points_rank, order_by = manager_id)
+  )) %>%
+  mutate(`Play All W` = number_of_teams - points_rank,
+         `Play All L` = points_rank - 1)
+
