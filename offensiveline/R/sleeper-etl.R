@@ -196,6 +196,8 @@ get_all_matchups_data <- function(max_week, league_id, file_path) {
                     by.x = c("players", "manager_id", "week"), by.y = c("starters", "manager_id", "week"),
                     all.x = TRUE)
 
+  all_data$full_name <- ifelse(is.na(all_data$full_name), all_data$players, all_data$full_name)
+
   return(all_data)
 }
 

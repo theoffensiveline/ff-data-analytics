@@ -11,7 +11,8 @@
 add_motw_to_matchups <-
   function(matchup_data,
            week_1_matchup_id,
-           max_week) {
+           max_week,
+           player_data) {
     # add MotW starting value to matchups
     matchup_data$motw <- NA
     matchup_data[(matchup_data$matchup_id == week_1_matchup_id) &
@@ -23,16 +24,16 @@ add_motw_to_matchups <-
         # get previous week
         prev_week <- week_num - 1
 
-        # get last loser of motw
-        prev_motw_losers <- matchup_data %>%
-          filter(week == prev_week, winner == 0, motw == 1) %>%
+        # get last winner of motw
+        prev_motw_winners <- matchup_data %>%
+          filter(week == prev_week, winner == 1, motw == 1) %>%
           pull(manager_id)
 
         # Iterate over each previous week's loser and assign motw
-        for (prev_motw_loser in prev_motw_losers) {
+        for (prev_motw_winner in prev_motw_winners) {
           matchup_data <- matchup_data %>%
             mutate(motw = ifelse(week == week_num &
-                                   manager_id == prev_motw_loser, 1, motw))
+                                   manager_id == prev_motw_winner, 1, motw))
         }
 
         # get the matchup id of the losers game
@@ -49,7 +50,14 @@ add_motw_to_matchups <-
           ))
       }
     }
-    return(matchup_data)
+    shots_data <- player_data %>%
+      filter(starter_id == 1) %>%
+      group_by(week, manager_id) %>%
+      summarise(`# of Shots` = sum(points < 10) + sum(points < 0))
+
+    output_data <-
+      matchup_data %>% left_join(shots_data, by = c("week", "manager_id"))
+    return(output_data)
   }
 
 
@@ -71,7 +79,8 @@ create_motw_table <- function(motw_data) {
       `Winner Team` = team_name[which.max(winner)],
       `Winner Score` = max(team_points),
       `Loser Score` = min(team_points),
-      `Loser Team` = team_name[which.min(winner)]
+      `Loser Team` = team_name[which.min(winner)],
+      `# of Shots/Dogs` = `# of Shots`[which.min(winner)]
     ) %>%
     distinct() %>%
     select(-week)

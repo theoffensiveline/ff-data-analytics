@@ -277,7 +277,8 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
     left_join(best_ball_matchups, by = c('week', 'manager_id', 'team_name', 'matchup_id')) %>%
     mutate(points_on_bench = team_points.y - team_points.x) %>%
     select(-team_points.x, -team_points.y, -winner.x, -winner.y) %>%
-    mutate(bench_pts_rank = rank(-points_on_bench))
+    mutate(most_bench_pts_rank = rank(-points_on_bench),
+           least_bench_pts_rank = rank(points_on_bench))
 
   most_bench_points <- bench_points %>%
     filter(week == current_week) %>%
@@ -287,7 +288,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
     '%s left %s points on the bench (#%s this season)',
     most_bench_points$team_name,
     most_bench_points$points_on_bench,
-    most_bench_points$bench_pts_rank
+    most_bench_points$most_bench_pts_rank
   )
 
   awards <-  rbind(awards,
@@ -302,7 +303,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
     '%s left %s points on the bench (#%s this season)',
     least_bench_points$team_name,
     round(least_bench_points$points_on_bench,2),
-    least_bench_points$bench_pts_rank
+    least_bench_points$least_bench_pts_rank
   )
 
   awards <-  rbind(awards,
