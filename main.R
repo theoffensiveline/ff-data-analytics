@@ -5,19 +5,16 @@ library(dplyr)
 library(offensiveline)
 library(ggplot2)
 library(reshape2)
+library(kableExtra)
+library(paletteer)
 
 # Define the league ID, sleeper players file, and get NFL state
-# league_id <- 968890022248103936
-league_id <- 996445270105714688
+# league_id <- 968890022248103936 # Walter league
+league_id <- 996445270105714688 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- NFL_state$week
-
-# Retrieve league details using the Sleeper API
-#league <- get_league(league_id)
-
-# Get the previous league ID for this league
-#league_id_2 <- league$previous_league_id
+current_week <- 1 #NFL_state$display_week
+current_year <- 23
 
 # get all player data for each matchup
 all_players <- get_all_matchups_data(current_week,
@@ -30,8 +27,9 @@ all_matchups <- get_team_matchups(player_data = all_players)
 # get MotW data
 motw_data <- add_motw_to_matchups(
   matchup_data = all_matchups,
-  week_1_matchup_id = 1,
-  max_week = current_week
+  week_1_matchup_id = 2,
+  max_week = current_week,
+  player_data = all_players
 )
 
 # create the motw output table
@@ -41,8 +39,8 @@ motw_table <- create_motw_table(motw_data)
 scoring_dist <- create_scoring_dist(
   matchup_data = all_matchups,
   max_week = current_week,
-  color_1 = "#22763FFF",
-  color_2 = "#5E4FA2FF"
+  color_1 = "#000DFF",
+  color_2 = "#999999"
 )
 
 # create weekly scoring chart
@@ -54,20 +52,82 @@ weekly_scores <-
 leaderboard <- create_leaderboard(matchup_data = all_matchups,
                                   max_week = current_week)
 
-# create power rankings
-power_rankings <- create_power_rankings(matchup_data = all_matchups,
-                                        max_week = current_week,
-                                        number_of_teams = length(unique(all_matchups$manager_id)))
+
+# # create power rankings
+# power_rankings <- create_power_rankings(
+#   matchup_data = all_matchups,
+#   max_week = current_week,
+#   number_of_teams = length(unique(all_matchups$manager_id))
+# )
+
 
 # create best ball data and outputs
-best_ball_lineups <- calc_best_ball_lineups(player_data = all_players, max_week = current_week)
+best_ball_lineups <-
+  calc_best_ball_lineups(player_data = all_players, max_week = current_week)
 
-best_ball_matchups <- create_best_ball_matchups(optimal_lineups = best_ball_lineups)
+best_ball_matchups <-
+  create_best_ball_matchups(optimal_lineups = best_ball_lineups)
 
-best_ball_leaderboard <- create_leaderboard(matchup_data = best_ball_matchups,
-                                            max_week = current_week)
+best_ball_leaderboard <-
+  create_leaderboard(matchup_data = best_ball_matchups,
+                     max_week = current_week)
 
 # create the awards table
-awards_table <- create_awards_table(player_data = all_players,
-                                    matchup_data = all_matchups,
-                                    best_ball_matchups = best_ball_matchups)
+awards_table <- create_awards_table(
+  player_data = all_players,
+  matchup_data = all_matchups,
+  best_ball_matchups = best_ball_matchups
+)
+
+# one matchup chart - need to setup a loop to output eventually
+match6_plot <- create_matchup_plot(player_data = all_players,
+                                   matchup_id = 6,
+                                   week = current_week)
+
+png(
+  file = paste0(
+    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+    current_year,
+    "\\Week",
+    current_week,
+    "\\Match6Plot.png"
+  ),
+  width = 900,
+  height = 600
+)
+match6_plot
+dev.off()
+
+# chart from Sleeper about manager efficiency
+efficiency_plot <-
+  create_efficiency_plot(
+    best_ball_matchups = best_ball_matchups,
+    matchup_data = all_matchups,
+    week = current_week
+  )
+
+
+# create motw shot history
+shots_dist <- create_shots_dist(
+  motw_data = motw_data,
+  max_week = current_week,
+  color_1 = "#000DFF",
+  color_2 = "#999999"
+)
+
+
+# motw data for python scripts - need to clean up
+full_season_player_data <- get_all_matchups_data(14, league_id, sleeper_players_csv)
+full_season_schedule <- get_team_matchups(full_season_schedule)
+full_season_motw_schedule <- add_motw_to_matchups(full_season_schedule, week_1_matchup_id = 2, max_week = 2, full_season_player_data)
+
+motw_schedule_output <- full_season_motw_schedule %>% select(week, team_name, matchup_id) %>%
+  group_by(matchup_id, week) %>%
+  mutate(team_order = row_number()) %>%
+  pivot_wider(names_from = team_order, values_from = team_name, names_prefix = "team") %>%
+  ungroup() %>%
+  select(-matchup_id)
+
+motw_schedule_output
+
+write_csv(motw_schedule_output, "schedule23.csv", col_names = FALSE)
