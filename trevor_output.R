@@ -52,20 +52,20 @@ png(
 shots_dist
 dev.off()
 
-# output motw plot
-png(
-  file = paste0(
-    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
-    current_year,
-    "\\Week",
-    current_week,
-    "\\MotwPlot.png"
-  ),
-  width = 900,
-  height = 600
-)
-motw_plot
-dev.off()
+# # output motw plot
+# png(
+#   file = paste0(
+#     "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+#     current_year,
+#     "\\Week",
+#     current_week,
+#     "\\MotwPlot.png"
+#   ),
+#   width = 900,
+#   height = 600
+# )
+# motw_plot
+# dev.off()
 
 # output leaderboard
 kable(
@@ -120,6 +120,21 @@ png(
   height = 600
 )
 scoring_dist
+dev.off()
+
+# output scoring chart
+png(
+  file = paste0(
+    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+    current_year,
+    "\\Week",
+    current_week,
+    "\\Scoring Plot.png"
+  ),
+  width = 900,
+  height = 600
+)
+weekly_scores
 dev.off()
 
 # output motw table

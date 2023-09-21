@@ -109,7 +109,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
       pos = "QB",
       data = player_data,
       current_week = current_week,
-      award_name = "Anti-Russ"
+      award_name = "Literally Throwing"
     )
   )
 
@@ -233,7 +233,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
 
   ###### Biggest Blowout and Closest Game ######
   game_margins <- matchup_data %>% group_by(week, matchup_id) %>%
-    mutate(game_margin = team_points[winner == 1] - team_points[winner == 0]) %>%
+    mutate(game_margin = round(team_points[winner == 1] - team_points[winner == 0], 2)) %>%
     ungroup() %>%
     mutate(blowout_rank = dense_rank(-game_margin),
            closest_rank = dense_rank(game_margin))
@@ -307,7 +307,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
   )
 
   awards <-  rbind(awards,
-                   c("Superlative" = "Least Depth",
+                   c("Superlative" = "Optimizer",
                      "Winner + Description" = least_bench_points_desc))
 
   return(awards)

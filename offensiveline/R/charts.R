@@ -151,11 +151,11 @@ create_matchup_plot <- function(player_data, matchup_id, week) {
 
 
 create_efficiency_plot <-
-  function(best_ball_matchups, matchup_data, week) {
+  function(best_ball_matchups, matchup_data, max_week) {
     chart_data <- best_ball_matchups %>%
       left_join(matchup_data, by = c('week', 'manager_id')) %>%
       mutate(percentage = team_points.y / team_points.x * 100) %>%
-      filter(week == week) %>%
+      filter(week == max_week) %>%
       arrange(desc(percentage)) # Sort by percentage in descending order
 
     final_chart <-

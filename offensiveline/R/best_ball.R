@@ -62,8 +62,8 @@ create_best_ball_matchups <-
       dplyr::summarize("team_points" = sum(points[optimal_slot != "BENCH"]))
 
     matchups <- matchups %>%
-      arrange(matchup_id, team_points) %>%
-      group_by(matchup_id) %>%
+      arrange(week, matchup_id, team_points) %>%
+      group_by(matchup_id, week) %>%
       mutate(winner = case_when(
         team_points == max(team_points) ~ 1,
         TRUE ~ 0

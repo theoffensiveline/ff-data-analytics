@@ -13,7 +13,7 @@ library(paletteer)
 league_id <- 996445270105714688 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 1 #NFL_state$display_week
+current_week <- 2 #NFL_state$display_week
 current_year <- 23
 
 # get all player data for each matchup
@@ -80,8 +80,8 @@ awards_table <- create_awards_table(
 )
 
 # one matchup chart - need to setup a loop to output eventually
-match6_plot <- create_matchup_plot(player_data = all_players,
-                                   matchup_id = 6,
+match_plot <- create_matchup_plot(player_data = all_players,
+                                   matchup_id = 3,
                                    week = current_week)
 
 png(
@@ -90,12 +90,12 @@ png(
     current_year,
     "\\Week",
     current_week,
-    "\\Match6Plot.png"
+    "\\Match3Plot.png"
   ),
   width = 900,
   height = 600
 )
-match6_plot
+match_plot
 dev.off()
 
 # chart from Sleeper about manager efficiency
@@ -103,7 +103,7 @@ efficiency_plot <-
   create_efficiency_plot(
     best_ball_matchups = best_ball_matchups,
     matchup_data = all_matchups,
-    week = current_week
+    max_week = current_week
   )
 
 
@@ -118,7 +118,7 @@ shots_dist <- create_shots_dist(
 
 # motw data for python scripts - need to clean up
 full_season_player_data <- get_all_matchups_data(14, league_id, sleeper_players_csv)
-full_season_schedule <- get_team_matchups(full_season_schedule)
+full_season_schedule <- get_team_matchups(full_season_player_data)
 full_season_motw_schedule <- add_motw_to_matchups(full_season_schedule, week_1_matchup_id = 2, max_week = 2, full_season_player_data)
 
 motw_schedule_output <- full_season_motw_schedule %>% select(week, team_name, matchup_id) %>%
