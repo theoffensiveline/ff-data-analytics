@@ -12,7 +12,7 @@
 find_top_player <- function(pos, data, current_week) {
   result <- data %>%
     filter(position == pos & starter_id == 1) %>%
-    mutate(rank = rank(-points)) %>%
+    mutate(rank = rank(-points, ties.method = "min")) %>%
     filter(week == current_week) %>%
     slice_max(order_by = points)
 
@@ -64,7 +64,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
   ###### Best and Worst Managers ######
   # find the best manager and points scored
   best_manager <- matchup_data %>%
-    mutate(team_points_rank = rank(-team_points)) %>%
+    mutate(team_points_rank = rank(-team_points, ties.method = "min")) %>%
     filter(week == current_week) %>%
     slice_max(order_by = team_points)
 
@@ -84,7 +84,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
 
   # find the worst manager and points scored
   worst_manager <- matchup_data %>%
-    mutate(team_points_rank = rank(team_points)) %>%
+    mutate(team_points_rank = rank(team_points, ties.method = "min")) %>%
     filter(week == current_week) %>%
     slice_max(order_by = -team_points)
 
@@ -198,7 +198,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
   # find the worst winner and points scored
   worst_winner <- matchup_data %>%
     filter(winner == 1) %>%
-    mutate(team_points_rank = rank(team_points)) %>%
+    mutate(team_points_rank = rank(team_points, ties.method = "min")) %>%
     filter(week == current_week) %>%
     slice_max(order_by = -team_points)
 
@@ -216,7 +216,7 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
   # find the worst winner and points scored
   best_loser <- matchup_data %>%
     filter(winner != 1) %>%
-    mutate(team_points_rank = rank(-team_points)) %>%
+    mutate(team_points_rank = rank(-team_points, ties.method = "min")) %>%
     filter(week == current_week) %>%
     slice_max(order_by = team_points)
 
@@ -235,8 +235,8 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
   game_margins <- matchup_data %>% group_by(week, matchup_id) %>%
     mutate(game_margin = round(team_points[winner == 1] - team_points[winner == 0], 2)) %>%
     ungroup() %>%
-    mutate(blowout_rank = dense_rank(-game_margin),
-           closest_rank = dense_rank(game_margin))
+    mutate(blowout_rank = rank(-game_margin, ties.method = "min"),
+           closest_rank = rank(game_margin, ties.method = "min"))
 
   biggest_blowout <- game_margins %>%
     filter(week == current_week) %>%
@@ -277,8 +277,8 @@ create_awards_table <- function(player_data, matchup_data, best_ball_matchups) {
     left_join(best_ball_matchups, by = c('week', 'manager_id', 'team_name', 'matchup_id')) %>%
     mutate(points_on_bench = team_points.y - team_points.x) %>%
     select(-team_points.x, -team_points.y, -winner.x, -winner.y) %>%
-    mutate(most_bench_pts_rank = rank(-points_on_bench),
-           least_bench_pts_rank = rank(points_on_bench))
+    mutate(most_bench_pts_rank = rank(-points_on_bench, ties.method = "min"),
+           least_bench_pts_rank = rank(points_on_bench, ties.method = "min"))
 
   most_bench_points <- bench_points %>%
     filter(week == current_week) %>%
