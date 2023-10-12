@@ -52,21 +52,6 @@ png(
 shots_dist
 dev.off()
 
-# # output motw plot
-# png(
-#   file = paste0(
-#     "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
-#     current_year,
-#     "\\Week",
-#     current_week,
-#     "\\MotwPlot.png"
-#   ),
-#   width = 900,
-#   height = 600
-# )
-# motw_plot
-# dev.off()
-
 # output leaderboard
 kable(
   leaderboard,
@@ -104,6 +89,46 @@ kable(
       "\\Week",
       current_week,
       "\\actual_lb_kable.html"
+    )
+  )
+
+# output power rankings
+kable(
+  power_rankings,
+  "html",
+  booktabs = TRUE,
+  escape = FALSE,
+  align = 'c'
+) %>%
+  column_spec(6,
+              color = "white",
+              background = spec_color2(power_rankings$`Team Ability`,
+                                       direction = 1)) %>%
+  column_spec(7,
+              color = "white",
+              background = spec_color2(power_rankings$`Str of Sched`,
+                                       direction = -1)) %>%
+  column_spec(
+    2,
+    color = ifelse(
+      is.na(power_rankings$Trend),
+      'white',
+      ifelse(
+        power_rankings$Trend == 0,
+        '#f9f7f1',
+        ifelse(power_rankings$Trend > 0, '#22763FFF', '#BE2A3EFF')
+      )
+    ),
+    background = ifelse(is.na(power_rankings$Trend), 'white', 'transparent')
+  ) %>%
+  cat(
+    .,
+    file = paste0(
+      "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+      current_year,
+      "\\Week",
+      current_week,
+      "\\power_rank_kable.html"
     )
   )
 
@@ -195,3 +220,63 @@ kable(
       "\\bb_lb_kable.html"
     )
   )
+
+
+# output PF PA chart
+png(
+  file = paste0(
+    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+    current_year,
+    "\\Week",
+    current_week,
+    "\\PF PA Plot.png"
+  ),
+  width = 900,
+  height = 600
+)
+PF_PA_chart
+dev.off()
+
+# output rank chart
+png(
+  file = paste0(
+    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+    current_year,
+    "\\Week",
+    current_week,
+    "\\Rank Plot.png"
+  ),
+  width = 900,
+  height = 600
+)
+rank_chart
+dev.off()
+
+
+# Define a function to generate matchup plots
+generate_matchup_plots <- function(matchup_id, week, current_year) {
+  match_plot <- create_matchup_plot(player_data = all_players,
+                                    matchup_id = matchup_id,
+                                    week = week)
+  
+  png(
+    file = paste0(
+      "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+      current_year,
+      "\\Week",
+      week,
+      "\\Match",
+      matchup_id,
+      "Plot.png"
+    ),
+    width = 900,
+    height = 600
+  )
+  print(match_plot)
+  dev.off()
+}
+
+# Loop through matchup_id values from 1 to 6 and generate plots
+for (matchup_id in 1:6) {
+  generate_matchup_plots(matchup_id, current_week, current_year)
+}

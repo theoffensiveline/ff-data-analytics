@@ -15,7 +15,7 @@ create_scoring_dist <-
       ifelse(matchup_data$week < max_week, 'Historic', 'This Week')
 
     matchup_data$Group <-
-      factor(matchup_data$Group, levels = c('This Week', 'Historic'))
+      factor(matchup_data$Group, levels = c('Historic', 'This Week'))
 
     matchup_data$Score <- matchup_data$team_points
 
@@ -32,7 +32,7 @@ create_scoring_dist <-
       ) +
       theme_classic() +
       theme(legend.position = "top", text = element_text(size = 20)) + scale_fill_manual(values =
-                                                                                           c(color_1, color_2)) +
+                                                                                           c(color_2, color_1)) +
       scale_x_continuous(breaks = seq(
         plyr::round_any(min(matchup_data$Score), 5, floor),
         plyr::round_any(max(matchup_data$Score), 5, ceiling),
@@ -83,7 +83,7 @@ create_weekly_scoring_chart <- function(matchup_data, max_week) {
       by = 15
     )) +
     labs(title = 'Weekly Scoring', x = 'Week', y = 'Points') +
-    scale_colour_manual(values = c("#22763FFF", "#5E4FA2FF", "#F46D43FF", "#BE2A3EFF"))
+    scale_colour_manual(values = c("#20A4F4", "#668F80", "#7E6551", "#FF3366"))
 
   return(weekly_scoring_plot)
 }
@@ -151,7 +151,9 @@ create_matchup_plot <- function(player_data, matchup_id, week) {
 
 
 create_efficiency_plot <-
-  function(best_ball_matchups, matchup_data, max_week) {
+  function(best_ball_matchups,
+           matchup_data,
+           max_week) {
     chart_data <- best_ball_matchups %>%
       left_join(matchup_data, by = c('week', 'manager_id')) %>%
       mutate(percentage = team_points.y / team_points.x * 100) %>%
@@ -165,16 +167,16 @@ create_efficiency_plot <-
         stat = "identity",
         position = "identity",
         alpha = .3,
-        fill = '#65645A',
-        color = '#65645A'
+        fill = '#7D8491',
+        color = '#7D8491'
       ) +
       geom_bar(
         aes(y = team_points.y),
         stat = "identity",
         position = "identity",
         alpha = .8,
-        fill = '#000DFF',
-        color = '#000DFF'
+        fill = '#20A4F4',
+        color = '#20A4F4'
       ) +
       labs(x = 'Team', y = 'Points') +
       coord_flip() +
@@ -183,7 +185,7 @@ create_efficiency_plot <-
         hjust = 'left',
         # Align the label to the left
         vjust = 'middle',
-        color = 'white',
+        color = '#2E2E2E',
         # Center the label vertically
         size = 4        # Adjust the size of labels if needed
       ) +
@@ -216,6 +218,22 @@ colorsByPosition <- c(
   DEF = '#65645A'
 )
 
+custom_palette <-
+  c(
+    "#ff3366",
+    "#fd3880",
+    "#f74398",
+    "#ed50af",
+    "#df5ec3",
+    "#cd6cd5",
+    "#b878e3",
+    "#a083ed",
+    "#858ef4",
+    "#6996f7",
+    "#499ef7",
+    "#20a4f3"
+  )
+
 spec_color2 <- function(x,
                         alpha = 1,
                         begin = 0,
@@ -225,7 +243,11 @@ spec_color2 <- function(x,
                         na_color = "#BBBBBB",
                         scale_from = NULL,
                         n = 12,
-                        palette = paletteer_c("ggthemes::Blue", n, direction)) {
+                        palette = custom_palette) {
+  if (direction == -1) {
+    custom_palette <- rev(custom_palette)
+  }
+
   n <- length(palette)
   if (is.null(scale_from)) {
     x <- round(scales::rescale(x, c(1, n)))
@@ -239,18 +261,142 @@ spec_color2 <- function(x,
   return(color_code)
 }
 
-create_shots_dist <- function(motw_data, max_week, color_1, color_2) {
-  motw_data$Group <-
-    ifelse(is.na(motw_data$motw), 'Not MotW', 'MotW')
 
-  shots_dist <- ggplot(motw_data[motw_data$winner == 0,], aes(x = `# of Shots`, fill = Group)) +
-    geom_bar(position = 'stack', color = '#000000') +
-    theme_classic() +
-    theme(legend.position = "top", text = element_text(size = 20)) + scale_fill_manual(values =
-                                                                                         c(color_1, color_2)) +
-    scale_x_continuous(breaks = seq(0, 9, 1)) +
-    scale_y_continuous(breaks = seq(0, 100, 1)) +
-    labs(title = 'Losing Teams Potential Shots Distribution', x = 'Shots', y = 'Count')
+create_shots_dist <-
+  function(motw_data, max_week, color_1, color_2) {
+    motw_data$Group <-
+      ifelse(is.na(motw_data$motw), 'Not MotW', 'MotW')
 
-  return(shots_dist)
+    motw_data$Group <-
+      factor(motw_data$Group, levels = c('Not MotW', 'MotW'))
+
+    shots_dist <-
+      ggplot(motw_data[motw_data$winner == 0,], aes(x = `# of Shots`, fill = Group)) +
+      geom_bar(position = 'stack', color = '#000000') +
+      theme_classic() +
+      theme(legend.position = "top", text = element_text(size = 20)) + scale_fill_manual(values =
+                                                                                           c(color_2, color_1)) +
+      scale_x_continuous(breaks = seq(0, 9, 1)) +
+      scale_y_continuous(breaks = seq(0, 100, 1)) +
+      labs(title = 'Losing Teams Potential Shots Distribution', x = 'Shots', y = 'Count')
+
+    return(shots_dist)
+  }
+
+create_PF_PA_scatter <- function(leaderboard, team_photos) {
+  df <-
+    leaderboard %>% left_join(team_photos, by = c("Team" = "team_name"))
+
+  scatterplot <- ggplot(df, aes(x = PF, y = PA)) +
+    geom_abline(slope = 1,
+                intercept = 0,
+                linetype = 'dotted') +
+    geom_image(data = subset(df, !is.na(avatar)),
+               aes(image = avatar),
+               size = 0.1) +
+    geom_text(data = subset(df, is.na(avatar)), aes(label = Team)) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    labs(x = "Points For",
+         y = "Points Against") +
+    scale_x_continuous(
+      limits = c(
+        plyr::round_any(min(df$PF), 50, floor),
+        plyr::round_any(max(df$PF), 50, ceiling)
+      ),
+      breaks = seq(
+        plyr::round_any(min(df$PF), 50, floor),
+        plyr::round_any(max(df$PF), 50, ceiling),
+        by = 50
+      )
+    ) +
+    scale_y_continuous(
+      limits = c(
+        plyr::round_any(min(df$PA), 50, floor),
+        plyr::round_any(max(df$PA), 50, ceiling)
+      ),
+      breaks = seq(
+        plyr::round_any(min(df$PA), 50, floor),
+        plyr::round_any(max(df$PA), 50, ceiling),
+        by = 50
+      )
+    ) +
+    annotate(
+      geom = "richtext",
+      x = plyr::round_any(min(df$PF), 50, floor),
+      y = plyr::round_any(min(df$PA), 50, floor),
+      label = "<span style='color: #20A4F4;'>Lucky</span> and <span style='color: #FF3366;'>Bad</span>",
+      hjust = 0,
+      vjust = 0
+    ) +
+    annotate(
+      geom = "richtext",
+      x = plyr::round_any(max(df$PF), 50, ceiling),
+      y = plyr::round_any(min(df$PA), 50, floor),
+      label = "<span style='color: #20A4F4;'>Lucky</span> and <span style='color: #20A4F4;'>Good</span>",
+      hjust = 1,
+      vjust = 0
+    ) +
+    annotate(
+      geom = "richtext",
+      x = plyr::round_any(min(df$PF), 50, floor),
+      y = plyr::round_any(max(df$PA), 50, ceiling),
+      label = "<span style='color: #FF3366;'>Unlucky</span> and <span style='color: #FF3366;'>Bad</span>",
+      hjust = 0,
+      vjust = 1
+    ) +
+    annotate(
+      geom = "richtext",
+      x = plyr::round_any(max(df$PF), 50, ceiling),
+      y = plyr::round_any(max(df$PA), 50, ceiling),
+      label = "<span style='color: #FF3366;'>Unlucky</span> and <span style='color: #20A4F4;'>Good</span>",
+      hjust = 1,
+      vjust = 1
+    )
+
+  return(scatterplot)
+}
+
+create_rank_chart <- function(matchup_data, team_photos) {
+  df <- matchup_data %>%
+    arrange(week, team_points) %>%
+    group_by(week) %>%
+    mutate(rank = rank(-team_points, ties.method = "min")) %>% left_join(team_photos, by = "team_name")
+
+  # Convert rank to a factor with reversed levels
+  df$rank <-
+    factor(df$rank, levels = rev(unique(df$rank)))
+
+  weekly_rank_plot <- ggplot(df, aes(x = week, y = rank)) +
+    geom_line(aes(group = team_name), linewidth = 0.5) +  # Add lines with distinct colors
+    geom_image(data = subset(df,!is.na(avatar)),
+               aes(image = avatar),
+               size = 0.09) +
+    geom_text(
+      data = subset(df, winner == 1),
+      # Add green tiles for winner == 1
+      aes(x = week, y = rank, label = 'W'),
+      color = "#20A4F4",
+      size = 3,
+      nudge_x = 0.2
+    ) +
+    geom_text(
+      data = subset(df, winner == 0),
+      # Add red tiles for winner == 0
+      aes(x = week, y = rank, label = 'L'),
+      color = "#FF3366",
+      size = 3,
+      nudge_x = 0.2
+    ) +
+    geom_text(data = subset(df, is.na(avatar)),
+              aes(label = team_name),
+              size = 2) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    scale_y_discrete(limits = rev) +
+    labs(x = 'Week', y = 'Rank')
+
+  return(weekly_rank_plot)
 }
