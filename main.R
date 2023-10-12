@@ -13,6 +13,7 @@ library(ggrepel)
 library(png)
 library(ggimage)
 library(ggtext)
+library(reticulate)
 
 # Define the league ID, sleeper players file, and get NFL state
 # league_id <- 968890022248103936 # Walter league
@@ -136,4 +137,12 @@ motw_schedule_output <-
 
 motw_schedule_output
 
-write_csv(motw_schedule_output, "schedule23.csv", col_names = FALSE)
+write_csv(motw_schedule_output, "currentMotW/schedule23.csv", col_names = FALSE)
+
+# run python script for MotW data - don't forget to edit first
+py_run_file("motw.py")
+
+danger_table <- create_danger_table()
+
+danger_chart <- create_danger_chart()
+

@@ -280,3 +280,51 @@ generate_matchup_plots <- function(matchup_id, week, current_year) {
 for (matchup_id in 1:6) {
   generate_matchup_plots(matchup_id, current_week, current_year)
 }
+
+# output danger table
+kable(danger_table,
+      "html",
+      booktabs = T,
+      escape = F,
+      align = 'c') %>%
+  column_spec(2, color = "white",
+              background = spec_color2(df[, 2],
+                                       direction = 1)) %>%
+  column_spec(3, color = "white",
+              background = spec_color2(df[, 3],
+                                       direction = -1)) %>%
+  column_spec(4, color = "white",
+              background = spec_color2(df[, 4],
+                                       direction = -1)) %>%
+  column_spec(5, color = "white",
+              background = spec_color2(df[, 5],
+                                       direction = -1)) %>%
+  column_spec(6, color = "white",
+              background = spec_color2(df[, 6],
+                                       direction = -1)) %>%
+  cat(
+    .,
+    file = paste0(
+      "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+      current_year,
+      "\\Week",
+      current_week,
+      "\\danger_kable.html"
+    )
+  )
+
+
+# output danger chart
+png(
+  file = paste0(
+    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+    current_year,
+    "\\Week",
+    current_week,
+    "\\Future MotW by Week.png"
+  ),
+  width = 900,
+  height = 600
+)
+danger_chart
+dev.off()
