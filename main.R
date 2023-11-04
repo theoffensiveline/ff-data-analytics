@@ -14,13 +14,14 @@ library(png)
 library(ggimage)
 library(ggtext)
 library(reticulate)
+library(rcartocolor)
 
 # Define the league ID, sleeper players file, and get NFL state
 # league_id <- 968890022248103936 # Walter league
 league_id <- 996445270105714688 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 5 #NFL_state$display_week
+current_week <- 8 #NFL_state$display_week
 current_year <- 23
 
 # team photos
@@ -137,7 +138,9 @@ motw_schedule_output <-
 
 motw_schedule_output
 
-write_csv(motw_schedule_output, "currentMotW/schedule23.csv", col_names = FALSE)
+write_csv(motw_schedule_output,
+          "currentMotW/schedule23.csv",
+          col_names = FALSE)
 
 # run python script for MotW data - don't forget to edit first
 py_run_file("motw.py")
@@ -146,3 +149,50 @@ danger_table <- create_danger_table()
 
 danger_chart <- create_danger_chart()
 
+
+##### need to clean up #####
+
+###### Create Playoff Board ######
+playoff_output <- leaderboard[, c(1, 3, 4, 5)]
+playoff_output$last_losses <- max(playoff_output$L)
+playoff_output$max_losses_top6 <- playoff_output[6, 4]
+playoff_output$max_losses_bottom6 <- playoff_output[7, 4]
+playoff_output$`Play-off #`[7:12] <-
+  (14 + 1 - playoff_output$W - playoff_output$max_losses_bottom6)[7:12, ]
+playoff_output$`Play-off #`[1:6] <-
+  (14 + 1 - playoff_output$W - playoff_output$max_losses_top6)[1:6, ]
+playoff_output$`Last #` <-
+  (14 - current_week) - (playoff_output$last_losses - playoff_output$L)
+
+playoff_output <- playoff_output[, c(1, 2, 3, 4, 8, 9)]
+
+playoff_output[12, 6] <-
+  playoff_output[12, 6] + (playoff_output[12, 4] - playoff_output[11, 4])
+playoff_output[playoff_output[, 5] <= 0, 5] <- NA
+playoff_output[playoff_output[, 5] > 2 * (14 - current_week) + 1, 5] <-
+  NA
+playoff_output[playoff_output[, 6] <= 0, 6] <- NA
+# playoff_output[playoff_output[, 6] > 2 * (14 - current_week) + 1, 6] <- NA
+
+###### Manual edit for playoff chances ######
+playoff_chances <- leaderboard[, 3]
+playoff_chances$`Play-off %` <- c(99.98,
+                                  99.85,
+                                  99.39,
+                                  95.72,
+                                  83.45,
+                                  40.1,
+                                  21.53,
+                                  40.72,
+                                  18.65,
+                                  0.32,
+                                  0.28,
+                                  0.01)
+playoff_chances$`Last %` <- c(0, 0, 0, 0, 0, 0.04, 0.05, 0.02, 0.02, 23.84, 33.41, 42.62)
+
+playoff_output <- merge(playoff_output, playoff_chances)
+
+playoff_output <-
+  playoff_output[order(playoff_output$Rank), c(2, 1, 3, 4, 7, 5, 8, 6)]
+
+row.names(playoff_output) <- NULL

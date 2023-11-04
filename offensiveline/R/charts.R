@@ -91,7 +91,7 @@ create_weekly_scoring_chart <- function(matchup_data, max_week) {
 create_matchup_plot <- function(player_data, matchup_id, week) {
   matchup <- player_data[!is.na(player_data$starter_id) &
                            player_data$matchup_id == matchup_id &
-                           player_data$week == week,]
+                           player_data$week == week, ]
 
   # Calculate the total team points for each team
   team_total_points <-
@@ -218,7 +218,7 @@ colorsByPosition <- c(
   DEF = '#65645A'
 )
 
-custom_palette <-
+custom_palette12 <-
   c(
     "#ff3366",
     "#fd3880",
@@ -234,6 +234,45 @@ custom_palette <-
     "#20a4f3"
   )
 
+custom_palette36 <- c(
+  "#ff3366",
+  "#ff346e",
+  "#fe3576",
+  "#fd387e",
+  "#fc3a86",
+  "#fa3e8e",
+  "#f84195",
+  "#f5459d",
+  "#f249a4",
+  "#ef4eab",
+  "#eb52b2",
+  "#e756b8",
+  "#e25bbf",
+  "#dd5fc5",
+  "#d863ca",
+  "#d268d0",
+  "#cc6cd5",
+  "#c670da",
+  "#bf74de",
+  "#b878e2",
+  "#b17ce6",
+  "#aa7fea",
+  "#a283ed",
+  "#9a86ef",
+  "#9289f1",
+  "#898cf3",
+  "#818ff5",
+  "#7892f6",
+  "#6f95f7",
+  "#6597f7",
+  "#5c9af7",
+  "#529cf7",
+  "#479ef6",
+  "#3ca0f6",
+  "#2fa2f4",
+  "#20a4f3"
+)
+
 spec_color2 <- function(x,
                         alpha = 1,
                         begin = 0,
@@ -243,9 +282,9 @@ spec_color2 <- function(x,
                         na_color = "#BBBBBB",
                         scale_from = NULL,
                         n = 12,
-                        palette = custom_palette) {
+                        palette = custom_palette36) {
   if (direction == -1) {
-    custom_palette <- rev(custom_palette)
+    custom_palette36 <- rev(custom_palette36)
   }
 
   n <- length(palette)
@@ -271,7 +310,7 @@ create_shots_dist <-
       factor(motw_data$Group, levels = c('Not MotW', 'MotW'))
 
     shots_dist <-
-      ggplot(motw_data[motw_data$winner == 0,], aes(x = `# of Shots`, fill = Group)) +
+      ggplot(motw_data[motw_data$winner == 0, ], aes(x = `# of Shots`, fill = Group)) +
       geom_bar(position = 'stack', color = '#000000') +
       theme_classic() +
       theme(legend.position = "top", text = element_text(size = 20)) + scale_fill_manual(values =
@@ -291,7 +330,7 @@ create_PF_PA_scatter <- function(leaderboard, team_photos) {
     geom_abline(slope = 1,
                 intercept = 0,
                 linetype = 'dotted') +
-    geom_image(data = subset(df, !is.na(avatar)),
+    geom_image(data = subset(df,!is.na(avatar)),
                aes(image = avatar),
                size = 0.1) +
     geom_text(data = subset(df, is.na(avatar)), aes(label = Team)) +
@@ -369,8 +408,8 @@ create_rank_chart <- function(matchup_data, team_photos) {
     factor(df$rank, levels = rev(unique(df$rank)))
 
   weekly_rank_plot <- ggplot(df, aes(x = week, y = rank)) +
-    geom_line(aes(group = team_name), linewidth = 0.5) +  # Add lines with distinct colors
-    geom_image(data = subset(df,!is.na(avatar)),
+    #geom_line(aes(group = team_name), linewidth = 0.5) +
+    geom_image(data = subset(df, !is.na(avatar)),
                aes(image = avatar),
                size = 0.09) +
     geom_text(
@@ -378,16 +417,16 @@ create_rank_chart <- function(matchup_data, team_photos) {
       # Add green tiles for winner == 1
       aes(x = week, y = rank, label = 'W'),
       color = "#20A4F4",
-      size = 3,
-      nudge_x = 0.2
+      size = 4,
+      nudge_x = 0.3
     ) +
     geom_text(
       data = subset(df, winner == 0),
       # Add red tiles for winner == 0
       aes(x = week, y = rank, label = 'L'),
       color = "#FF3366",
-      size = 3,
-      nudge_x = 0.2
+      size = 4,
+      nudge_x = 0.3
     ) +
     geom_text(data = subset(df, is.na(avatar)),
               aes(label = team_name),
@@ -396,6 +435,7 @@ create_rank_chart <- function(matchup_data, team_photos) {
     theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
     scale_y_discrete(limits = rev) +
+    scale_x_discrete() +
     labs(x = 'Week', y = 'Rank')
 
   return(weekly_rank_plot)

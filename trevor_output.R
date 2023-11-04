@@ -100,14 +100,18 @@ kable(
   escape = FALSE,
   align = 'c'
 ) %>%
-  column_spec(6,
-              color = "white",
-              background = spec_color2(power_rankings$`Team Ability`,
-                                       direction = 1)) %>%
-  column_spec(7,
-              color = "white",
-              background = spec_color2(power_rankings$`Str of Sched`,
-                                       direction = -1)) %>%
+  column_spec(
+    6,
+    color = "white",
+    background = spec_color2(power_rankings$`Team Ability`,
+                             direction = 1)
+  ) %>%
+  column_spec(
+    7,
+    color = "white",
+    background = spec_color2(power_rankings$`Str of Sched`,
+                             direction = -1)
+  ) %>%
   column_spec(
     2,
     color = ifelse(
@@ -170,6 +174,36 @@ kable(
   escape = F,
   align = 'c'
 ) %>%
+  column_spec(
+    3,
+    color = "white",
+    background = spec_color2(
+      x = motw_table$`Winner Score`,
+      scale_from = c(
+        min(all_matchups$team_points),
+        max(all_matchups$team_points)
+      ),
+      direction = 1
+    )
+  ) %>%
+  column_spec(
+    4,
+    color = "white",
+    background = spec_color2(
+      x = motw_table$`Loser Score`,
+      scale_from = c(
+        min(all_matchups$team_points),
+        max(all_matchups$team_points)
+      ),
+      direction = 1
+    )
+  ) %>%
+  column_spec(
+    6,
+    color = "white",
+    background = spec_color2(motw_table$`# of Shots/Dogs`,
+                             direction = -1)
+  ) %>%
   cat(
     .,
     file = paste0(
@@ -189,14 +223,18 @@ kable(
   escape = FALSE,
   align = 'c'
 ) %>%
-  column_spec(6,
-              color = "white",
-              background = spec_color2(best_ball_leaderboard$`PF`,
-                                       direction = 1)) %>%
-  column_spec(7,
-              color = "white",
-              background = spec_color2(best_ball_leaderboard$`PA`,
-                                       direction = -1)) %>%
+  column_spec(
+    6,
+    color = "white",
+    background = spec_color2(best_ball_leaderboard$`PF`,
+                             direction = 1)
+  ) %>%
+  column_spec(
+    7,
+    color = "white",
+    background = spec_color2(best_ball_leaderboard$`PA`,
+                             direction = -1)
+  ) %>%
   column_spec(
     2,
     color = ifelse(
@@ -282,25 +320,32 @@ for (matchup_id in 1:6) {
 }
 
 # output danger table
-kable(danger_table,
-      "html",
-      booktabs = T,
-      escape = F,
-      align = 'c') %>%
-  column_spec(2, color = "white",
-              background = spec_color2(df[, 2],
+kable(
+  danger_table,
+  "html",
+  booktabs = T,
+  escape = F,
+  align = 'c'
+) %>%
+  column_spec(2,
+              color = "white",
+              background = spec_color2(danger_table[, 2],
                                        direction = 1)) %>%
-  column_spec(3, color = "white",
-              background = spec_color2(df[, 3],
+  column_spec(3,
+              color = "white",
+              background = spec_color2(danger_table[, 3],
                                        direction = -1)) %>%
-  column_spec(4, color = "white",
-              background = spec_color2(df[, 4],
+  column_spec(4,
+              color = "white",
+              background = spec_color2(danger_table[, 4],
                                        direction = -1)) %>%
-  column_spec(5, color = "white",
-              background = spec_color2(df[, 5],
+  column_spec(5,
+              color = "white",
+              background = spec_color2(danger_table[, 5],
                                        direction = -1)) %>%
-  column_spec(6, color = "white",
-              background = spec_color2(df[, 6],
+  column_spec(6,
+              color = "white",
+              background = spec_color2(danger_table[, 6],
                                        direction = -1)) %>%
   cat(
     .,
@@ -328,3 +373,54 @@ png(
 )
 danger_chart
 dev.off()
+
+###### Playoff Output ######
+kable(
+  playoff_output,
+  "html",
+  booktabs = T,
+  escape = F,
+  align = 'c'
+) %>%
+  #column_spec(1, width_max = "10%") %>%
+  #column_spec(2, width = "30%") %>%
+  #column_spec(3, width_max = "10%") %>%
+  #column_spec(4, width_max = "10%") %>%
+  column_spec(
+    8,
+    color = "black",
+    # width = "20%",
+    background = ifelse(
+      is.na(playoff_output$`Last #`),
+      '#20A4F4',
+      ifelse(is.na(playoff_output$`Last #`), '#FF3366', 'white')
+    )
+  ) %>%
+  column_spec(
+    6,
+    color = "black",
+    # width = "20%",
+    background = ifelse(
+      is.na(playoff_output$`Play-off #`),
+      '#20A4F4',
+      ifelse(is.na(playoff_output$`Play-off #`), '#FF3366', 'white')
+    )
+  ) %>%
+  column_spec(5,
+              color = "black",
+              # width = "20%",
+              background = spec_color2(playoff_output$`Play-off %`)) %>%
+  column_spec(7,
+              color = "black",
+              # width = "20%",
+              background = spec_color2(-playoff_output$`Last %`)) %>%
+  cat(
+    .,
+    file = paste0(
+      "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+      current_year,
+      "\\Week",
+      current_week,
+      "\\playoff_kable.html"
+    )
+  )

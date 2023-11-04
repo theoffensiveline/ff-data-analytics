@@ -101,6 +101,9 @@ create_danger_table <- function() {
   left_tree$Count <- 0.5
   right_tree$Count <- 0.5
 
+  Current_Champion <- tree$Champion[1]
+  Current_Opponent <- tree$Opponent[1]
+
   tree_champ <- tree[, c(1, 2, 4)]
   tree_opp <- tree[, c(1, 3, 4)]
   names(tree_opp) <- names(tree_champ)

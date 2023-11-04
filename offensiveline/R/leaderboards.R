@@ -98,11 +98,11 @@ create_power_rankings <-
       mutate(all_ws = number_of_teams - rank, all_ls = rank - 1) %>%
       mutate(
         week_weight = case_when(
-          week == max_week ~ 1.5,
-          week == max_week - 1 ~ 1.4,
-          week == max_week - 2 ~ 1.3,
-          week == max_week - 3 ~ 1.2,
-          week == max_week - 4 ~ 1.1,
+          week == max_week ~ 2,
+          week == max_week - 1 ~ 1.8,
+          week == max_week - 2 ~ 1.6,
+          week == max_week - 3 ~ 1.4,
+          week == max_week - 4 ~ 1.2,
           TRUE ~ 1  # Default value if none of the conditions are met
         )
       ) %>% group_by(week, matchup_id) %>%
