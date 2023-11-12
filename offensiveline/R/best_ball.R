@@ -73,7 +73,17 @@ create_best_ball_matchups <-
   }
 
 calc_bench_points <- function(matchup_data, optimal_lineups) {
-  bench_points <- matchup_data %>% left_join(optimal_lineups)
+  best_ball_matchups <- create_best_ball_matchups(optimal_lineups)
+
+  bench_points <- matchup_data %>%
+    left_join(best_ball_matchups,
+              by = c('week', 'manager_id', 'team_name', 'matchup_id')) %>%
+    mutate(points_on_bench = team_points.y - team_points.x) %>%
+    select(-team_points.x,-team_points.y,-winner.x,-winner.y) %>%
+    mutate(
+      most_bench_pts_rank = rank(-points_on_bench, ties.method = "min"),
+      least_bench_pts_rank = rank(points_on_bench, ties.method = "min")
+    )
 
   return(bench_points)
 }

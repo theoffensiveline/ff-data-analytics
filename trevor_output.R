@@ -424,3 +424,44 @@ kable(
       "\\playoff_kable.html"
     )
   )
+
+
+# output median leaderboard
+kable(
+  median_leaderboard,
+  "html",
+  booktabs = TRUE,
+  escape = FALSE,
+  align = 'c'
+) %>%
+  column_spec(6,
+              color = "white",
+              background = spec_color2(median_leaderboard$`PF`,
+                                       direction = 1)) %>%
+  column_spec(7,
+              color = "white",
+              background = spec_color2(median_leaderboard$`PA`,
+                                       direction = -1)) %>%
+  column_spec(
+    2,
+    color = ifelse(
+      is.na(median_leaderboard$Diff),
+      'white',
+      ifelse(
+        median_leaderboard$Diff == 0,
+        '#f9f7f1',
+        ifelse(median_leaderboard$Diff > 0, '#22763FFF', '#BE2A3EFF')
+      )
+    ),
+    background = ifelse(is.na(median_leaderboard$Diff), 'white', 'transparent')
+  ) %>%
+  cat(
+    .,
+    file = paste0(
+      "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+      current_year,
+      "\\Week",
+      current_week,
+      "\\median_lb_kable.html"
+    )
+  )

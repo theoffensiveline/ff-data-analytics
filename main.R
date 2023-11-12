@@ -21,7 +21,7 @@ library(rcartocolor)
 league_id <- 996445270105714688 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 8 #NFL_state$display_week
+current_week <- 9 #NFL_state$display_week
 current_year <- 23
 
 # team photos
@@ -78,6 +78,9 @@ power_rankings <- create_power_rankings(
   number_of_teams = length(unique(all_matchups$manager_id))
 )
 
+
+test <- calc_bench_points(all_matchups, best_ball_lineups)
+
 # create best ball data and outputs
 best_ball_lineups <-
   calc_best_ball_lineups(player_data = all_players,
@@ -104,7 +107,6 @@ efficiency_plot <-
     matchup_data = all_matchups,
     max_week = current_week
   )
-
 
 # create motw shot history
 shots_dist <- create_shots_dist(
@@ -176,19 +178,19 @@ playoff_output[playoff_output[, 6] <= 0, 6] <- NA
 
 ###### Manual edit for playoff chances ######
 playoff_chances <- leaderboard[, 3]
-playoff_chances$`Play-off %` <- c(99.98,
-                                  99.85,
-                                  99.39,
-                                  95.72,
-                                  83.45,
-                                  40.1,
-                                  21.53,
-                                  40.72,
-                                  18.65,
-                                  0.32,
-                                  0.28,
-                                  0.01)
-playoff_chances$`Last %` <- c(0, 0, 0, 0, 0, 0.04, 0.05, 0.02, 0.02, 23.84, 33.41, 42.62)
+playoff_chances$`Play-off %` <- c(99.99,
+                                  99.99,
+                                  98.95,
+                                  98.41,
+                                  75.92,
+                                  41.78,
+                                  45.16,
+                                  17.67,
+                                  12.52,
+                                  8.26,
+                                  0.9,
+                                  0.45)
+playoff_chances$`Last %` <- c(0, 0, 0, 0, 0.08, 0.32, 0.73, 2.55, 3.52, 7.62, 40.28, 44.9)
 
 playoff_output <- merge(playoff_output, playoff_chances)
 
@@ -196,3 +198,110 @@ playoff_output <-
   playoff_output[order(playoff_output$Rank), c(2, 1, 3, 4, 7, 5, 8, 6)]
 
 row.names(playoff_output) <- NULL
+
+# extra game against median each week
+median_leaderboard <- create_median_leaderboard(all_matchups, current_week)
+
+
+
+transactions <- get_transactions(league_id, 10)
+
+transactions[transactions$type == 'trade', c('type', 'status')]
+
+yahoo_trans <- read.csv("C:/Users/Trevor/Documents/Fantasy Football/transactions.csv")
+
+yahoo_trades <- yahoo_trans[yahoo_trans$type == 'trade',]
+
+yahoo_trades$week <- yahoo_trades$week_idx - 35
+
+yahoo_trades %>%
+  mutate(veto_id = case_when(ts %in% 
+                               c('11/10/2022, 20:05:26',
+                                 '10/25/2022, 20:28:13',
+                                 '10/13/2022, 15:15:37',
+                                 '10/13/2022, 13:48:34',
+                                 '10/13/2022, 09:54:58',
+                                 '10/12/2022, 08:49:01',
+                                 '10/11/2022, 19:14:50') ~ 1,
+                             TRUE ~ 0)) %>%
+  group_by(type, week, veto_id) %>%
+  summarize(count_distinct_ts = n_distinct(ts))
+
+
+trades_by_week <- data.frame(week = c(1:12), 
+                                     sleeper_trades = c(0,1,1,1,1,0,1,0,3,NA,NA,NA),
+                                     yahoo_trades = c(0,0,1,1,0,2,0,3,3,3,3,1),
+                                     vetoed_yahoo_trades = c(0,0,0,0,0,5,0,1,0,0,1,0)
+                                     )
+
+# Assuming your data frame is named 'trades_by_week'
+trades_by_week_plot <- ggplot(trades_by_week, aes(x = week)) +
+  geom_line(aes(y = cumsum(yahoo_trades), color = "Yahoo Trades"), size = 1.2) +
+  geom_line(aes(y = cumsum(vetoed_yahoo_trades), color = "Vetoed Yahoo Trades"), size = 1.2) +
+  geom_line(aes(y = cumsum(sleeper_trades), color = "Sleeper Trades"), size = 1.2) +
+  scale_color_manual(values = c("Yahoo Trades" = "#410093", "Vetoed Yahoo Trades" = "#FF3366", "Sleeper Trades" = "#20A4F4")) +
+  labs(title = "Cumulative Trades by Week",
+       x = "Week",
+       y = "Cumulative Trades") +
+  scale_x_continuous(breaks = seq(1, 12, 1)) +
+  scale_y_continuous(breaks = seq(0, 20, 2)) +
+  theme_classic()
+
+trades_by_week_plot
+
+# output chart
+png(
+  file = paste0(
+    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+    current_year,
+    "\\Week",
+    current_week,
+    "\\Trades by Week.png"
+  ),
+  width = 900,
+  height = 600
+)
+trades_by_week_plot
+dev.off()
+
+
+
+
+##### New Site Stuff #####
+###### Efficiency Data ######
+chart_data <- best_ball_matchups %>%
+  left_join(all_matchups, by = c('week', 'manager_id')) %>%
+  mutate(
+    max_points = team_points.x,       # Rename team_points.y to max_points
+    actual_points = team_points.y,    # Rename team_points.x to actual_points
+    team_name = team_name.x,          # Rename team_name.x to team_name
+    percentage = actual_points / max_points * 100
+  ) %>%
+  filter(week == current_week) %>%
+  arrange(desc(actual_points), desc(max_points)) %>%       # Sort by percentage in descending order
+  select(team_name, actual_points, max_points, percentage)
+
+library(clipr)
+
+# Assuming 'chart_data' is your dataframe
+json_data <- jsonlite::toJSON(chart_data, pretty = TRUE)
+
+# Copy the JSON data to the clipboard
+write_clip(json_data)
+
+###### Scoring Distribution ######
+matchup_data <- all_matchups
+
+matchup_data$Group <-
+  ifelse(matchup_data$week < current_week, 'Historic', 'This Week')
+
+matchup_data$Group <-
+  factor(matchup_data$Group, levels = c('Historic', 'This Week'))
+
+matchup_data$Score <- matchup_data$team_points
+
+# Assuming 'chart_data' is your dataframe
+json_data <- jsonlite::toJSON(matchup_data, pretty = TRUE)
+
+# Copy the JSON data to the clipboard
+write_clip(json_data)

@@ -58,11 +58,11 @@ create_power_rankings <-
       mutate(all_ws = number_of_teams - rank, all_ls = rank - 1) %>%
       mutate(
         week_weight = case_when(
-          week == max_week ~ 1.5,
-          week == max_week - 1 ~ 1.4,
-          week == max_week - 2 ~ 1.3,
-          week == max_week - 3 ~ 1.2,
-          week == max_week - 4 ~ 1.1,
+          week == max_week ~ 2,
+          week == max_week - 1 ~ 1.8,
+          week == max_week - 2 ~ 1.6,
+          week == max_week - 3 ~ 1.4,
+          week == max_week - 4 ~ 1.2,
           TRUE ~ 1  # Default value if none of the conditions are met
         )
       ) %>% group_by(week, matchup_id) %>%
@@ -142,3 +142,41 @@ create_power_rankings <-
 
     return(power_rankings)
   }
+
+create_median_leaderboard <- function(matchup_data, max_week) {
+  # get current leaderboard
+  leaderboard <- create_leaderboard(matchup_data, max_week)
+
+  leaderboard <- leaderboard %>% rename(Rank_L = Rank) %>% select(Team, Rank_L)
+
+  # create current leaderboard
+  median_leaderboard <- matchup_data %>%
+    group_by(week, matchup_id) %>%
+    arrange(manager_id) %>%
+    mutate(other_team_points = case_when(
+      manager_id == unique(manager_id)[1] ~ lead(team_points, order_by = manager_id),
+      manager_id != unique(manager_id)[1] ~ lag(team_points, order_by = manager_id)
+    )) %>%
+    ungroup() %>%
+    filter(week <= max_week) %>%
+    group_by(week) %>%
+    mutate(week_pts_rank = rank(-team_points)) %>%
+    mutate(week_pts_win = case_when(week_pts_rank <= 6 ~ 1, week_pts_rank > 6 ~ 0)) %>%
+    group_by(team_name) %>%
+    reframe(
+      Team = team_name,
+      W = sum(winner) + sum(week_pts_win),
+      L = 2*n() - sum(winner) - sum(week_pts_win),
+      PF = sum(team_points),
+      PA = sum(other_team_points)
+    ) %>%
+    distinct() %>%
+    arrange(desc(W), desc(PF)) %>%
+    mutate(Rank = row_number()) %>%
+    left_join(leaderboard, by = 'Team') %>%
+    mutate(Diff = Rank_L - Rank) %>%
+    select(Rank, Diff, Team, W, L, PF, PA)
+
+  return(median_leaderboard)
+}
+
