@@ -418,7 +418,7 @@ create_rank_chart <- function(matchup_data, team_photos) {
       aes(x = week, y = rank, label = 'W'),
       color = "#20A4F4",
       size = 4,
-      nudge_x = 0.3
+      nudge_x = 0.45
     ) +
     geom_text(
       data = subset(df, winner == 0),
@@ -426,7 +426,7 @@ create_rank_chart <- function(matchup_data, team_photos) {
       aes(x = week, y = rank, label = 'L'),
       color = "#FF3366",
       size = 4,
-      nudge_x = 0.3
+      nudge_x = 0.45
     ) +
     geom_text(data = subset(df, is.na(avatar)),
               aes(label = team_name),

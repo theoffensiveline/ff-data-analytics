@@ -6,8 +6,8 @@ import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 
 CURRENT_YEAR = 23
-CURRENT_WEEK = 10
-CURRENT_CHAMPION = "The Werbenjägermanjensens"
+CURRENT_WEEK = 12
+CURRENT_CHAMPION = "Just Joshin"
 MATT_S_TEAM_NAME = "Kirk Thuggins & the boys"
 matchups = [['Week', 'Champion', 'Opponent']]
 
@@ -111,7 +111,7 @@ def main():
     
     # left tree
 
-    tree, dot = build(CURRENT_CHAMPION, CURRENT_WEEK, 13,
+    tree, dot = build(CURRENT_CHAMPION, CURRENT_WEEK, 14,
                       schedule, dot, str(uuid.uuid1()))
 
     with open('currentMotW/matchup_tree_left.csv', 'w') as myfile:
@@ -123,7 +123,7 @@ def main():
     # right tree
 
     tree, dot = build(schedule[CURRENT_WEEK][CURRENT_CHAMPION],
-                      CURRENT_WEEK, 13, schedule, dot, str(uuid.uuid1()))
+                      CURRENT_WEEK, 14, schedule, dot, str(uuid.uuid1()))
 
     with open('currentMotW/matchup_tree_right.csv', 'w') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
