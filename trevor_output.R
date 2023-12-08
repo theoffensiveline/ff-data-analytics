@@ -391,7 +391,7 @@ kable(
     color = "black",
     # width = "20%",
     background = ifelse(
-      is.na(playoff_output$`Last #`),
+      playoff_output$`Last #` == "SAFE",
       '#20A4F4',
       ifelse(is.na(playoff_output$`Last #`), '#FF3366', 'white')
     )
@@ -401,9 +401,9 @@ kable(
     color = "black",
     # width = "20%",
     background = ifelse(
-      is.na(playoff_output$`Play-off #`),
+      playoff_output$`Play-off #` == "CLINCHED",
       '#20A4F4',
-      ifelse(is.na(playoff_output$`Play-off #`), '#FF3366', 'white')
+      ifelse(playoff_output$`Play-off #` == "ELIMINATED", '#FF3366', 'white')
     )
   ) %>%
   column_spec(5,
@@ -424,7 +424,6 @@ kable(
       "\\playoff_kable.html"
     )
   )
-
 
 # output median leaderboard
 kable(

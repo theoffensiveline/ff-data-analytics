@@ -21,7 +21,7 @@ library(rcartocolor)
 league_id <- 996445270105714688 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 11 #NFL_state$display_week
+current_week <- 13 #NFL_state$display_week
 current_year <- 23
 
 # team photos
@@ -90,7 +90,8 @@ best_ball_matchups <-
   create_best_ball_matchups(optimal_lineups = best_ball_lineups)
 
 best_ball_leaderboard <-
-  create_leaderboard(matchup_data = best_ball_matchups,
+  create_best_ball_leaderboard(matchup_data = all_matchups,
+    best_ball_matchup_data = best_ball_matchups,
                      max_week = current_week)
 
 # create the awards table
@@ -164,33 +165,34 @@ playoff_output$`Play-off #`[7:12] <-
 playoff_output$`Play-off #`[1:6] <-
   (14 + 1 - playoff_output$W - playoff_output$max_losses_top6)[1:6, ]
 playoff_output$`Last #` <-
-  (14 - current_week) - (playoff_output$last_losses - playoff_output$L)
+  (14 - current_week) - (playoff_output$last_losses - playoff_output$L - 1)
 
 playoff_output <- playoff_output[, c(1, 2, 3, 4, 8, 9)]
 
 playoff_output[12, 6] <-
   playoff_output[12, 6] + (playoff_output[12, 4] - playoff_output[11, 4])
-playoff_output[playoff_output[, 5] <= 0, 5] <- NA
-playoff_output[playoff_output[, 5] > 2 * (14 - current_week) + 1, 5] <-
-  NA
-playoff_output[playoff_output[, 6] <= 0, 6] <- NA
+playoff_output$`Play-off #` <- as.character(playoff_output$`Play-off #`)
+playoff_output[playoff_output[, 5] > 2 * (14 - current_week) + 1, 5] <- 'ELIMINATED'
+playoff_output[playoff_output[, 5] <= 0, 5] <- 'CLINCHED'
+playoff_output$`Last #` <- as.character(playoff_output$`Last #`)
+playoff_output[playoff_output[, 6] <= 0, 6] <- 'SAFE'
 # playoff_output[playoff_output[, 6] > 2 * (14 - current_week) + 1, 6] <- NA
 
 ###### Manual edit for playoff chances ######
 playoff_chances <- leaderboard[, 3]
 playoff_chances$`Play-off %` <- c(100,
                                   100,
-                                  99.98,
-                                  99.98,
-                                  96.46,
-                                  35.65,
-                                  24.36,
-                                  28.26,
-                                  11.08,
-                                  2.14,
-                                  0.52,
-                                  1.57)
-playoff_chances$`Last %` <- c(0, 0, 0, 0, 0, 0.2, 0.48, 2.08, 7.23, 15.58, 45.81, 28.62)
+                                  100,
+                                  100,
+                                  100,
+                                  62,
+                                  21,
+                                  17,
+                                  0,
+                                  0,
+                                  0,
+                                  0)
+playoff_chances$`Last %` <- c(0, 0, 0, 0, 0, 0, 0, 0, 1.87, 3.43, 19.16, 75.54)
 
 playoff_output <- merge(playoff_output, playoff_chances)
 
@@ -204,62 +206,62 @@ median_leaderboard <- create_median_leaderboard(all_matchups, current_week)
 
 
 
-transactions <- get_transactions(league_id, 11)
-
-transactions[transactions$type == 'trade', c('type', 'status')]
-
-yahoo_trans <- read.csv("C:/Users/Trevor/Documents/Fantasy Football/transactions.csv")
-
-yahoo_trades <- yahoo_trans[yahoo_trans$type == 'trade',]
-
-yahoo_trades$week <- yahoo_trades$week_idx - 35
-
-yahoo_trades %>%
-  mutate(veto_id = case_when(ts %in% 
-                               c('11/10/2022, 20:05:26',
-                                 '10/25/2022, 20:28:13',
-                                 '10/13/2022, 15:15:37',
-                                 '10/13/2022, 13:48:34',
-                                 '10/13/2022, 09:54:58',
-                                 '10/12/2022, 08:49:01',
-                                 '10/11/2022, 19:14:50') ~ 1,
-                             TRUE ~ 0)) %>%
-  group_by(type, week, veto_id) %>%
-  summarize(count_distinct_ts = n_distinct(ts))
-
-
-trades_by_week <- data.frame(week = c(1:12), 
-                                     sleeper_trades = c(0,1,1,1,1,0,1,0,3,0,4,0),
-                                     yahoo_trades = c(0,0,1,1,0,2,0,3,3,3,3,1),
-                                     vetoed_yahoo_trades = c(0,0,0,0,0,5,0,1,0,0,1,0)
-                                     )
-
-# Assuming your data frame is named 'trades_by_week'
-trades_by_week_plot <- ggplot(trades_by_week, aes(x = week)) +
-  geom_line(aes(y = cumsum(yahoo_trades), color = "Yahoo Trades"), size = 1.2) +
-  geom_line(aes(y = cumsum(vetoed_yahoo_trades), color = "Vetoed Yahoo Trades"), size = 1.2) +
-  geom_line(aes(y = cumsum(sleeper_trades), color = "Sleeper Trades"), size = 1.2) +
-  scale_color_manual(values = c("Yahoo Trades" = "#410093", "Vetoed Yahoo Trades" = "#FF3366", "Sleeper Trades" = "#20A4F4")) +
-  labs(title = "Cumulative Trades by Week",
-       x = "Week",
-       y = "Cumulative Trades") +
-  scale_x_continuous(breaks = seq(1, 12, 1)) +
-  scale_y_continuous(breaks = seq(0, 20, 2)) +
-  theme_classic()
-
-trades_by_week_plot
-
-# output chart
-png(
-  file = paste0(
-    "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
-    current_year,
-    "\\Week",
-    current_week,
-    "\\Trades by Week.png"
-  ),
-  width = 900,
-  height = 600
-)
-trades_by_week_plot
-dev.off()
+# transactions <- get_transactions(league_id, 11)
+# 
+# transactions[transactions$type == 'trade', c('type', 'status')]
+# 
+# yahoo_trans <- read.csv("C:/Users/Trevor/Documents/Fantasy Football/transactions.csv")
+# 
+# yahoo_trades <- yahoo_trans[yahoo_trans$type == 'trade',]
+# 
+# yahoo_trades$week <- yahoo_trades$week_idx - 35
+# 
+# yahoo_trades %>%
+#   mutate(veto_id = case_when(ts %in% 
+#                                c('11/10/2022, 20:05:26',
+#                                  '10/25/2022, 20:28:13',
+#                                  '10/13/2022, 15:15:37',
+#                                  '10/13/2022, 13:48:34',
+#                                  '10/13/2022, 09:54:58',
+#                                  '10/12/2022, 08:49:01',
+#                                  '10/11/2022, 19:14:50') ~ 1,
+#                              TRUE ~ 0)) %>%
+#   group_by(type, week, veto_id) %>%
+#   summarize(count_distinct_ts = n_distinct(ts))
+# 
+# 
+# trades_by_week <- data.frame(week = c(1:12), 
+#                                      sleeper_trades = c(0,1,1,1,1,0,1,0,3,0,4,0),
+#                                      yahoo_trades = c(0,0,1,1,0,2,0,3,3,3,3,1),
+#                                      vetoed_yahoo_trades = c(0,0,0,0,0,5,0,1,0,0,1,0)
+#                                      )
+# 
+# # Assuming your data frame is named 'trades_by_week'
+# trades_by_week_plot <- ggplot(trades_by_week, aes(x = week)) +
+#   geom_line(aes(y = cumsum(yahoo_trades), color = "Yahoo Trades"), size = 1.2) +
+#   geom_line(aes(y = cumsum(vetoed_yahoo_trades), color = "Vetoed Yahoo Trades"), size = 1.2) +
+#   geom_line(aes(y = cumsum(sleeper_trades), color = "Sleeper Trades"), size = 1.2) +
+#   scale_color_manual(values = c("Yahoo Trades" = "#410093", "Vetoed Yahoo Trades" = "#FF3366", "Sleeper Trades" = "#20A4F4")) +
+#   labs(title = "Cumulative Trades by Week",
+#        x = "Week",
+#        y = "Cumulative Trades") +
+#   scale_x_continuous(breaks = seq(1, 12, 1)) +
+#   scale_y_continuous(breaks = seq(0, 20, 2)) +
+#   theme_classic()
+# 
+# trades_by_week_plot
+# 
+# # output chart
+# png(
+#   file = paste0(
+#     "C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball",
+#     current_year,
+#     "\\Week",
+#     current_week,
+#     "\\Trades by Week.png"
+#   ),
+#   width = 900,
+#   height = 600
+# )
+# trades_by_week_plot
+# dev.off()

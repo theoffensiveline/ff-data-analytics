@@ -180,3 +180,34 @@ create_median_leaderboard <- function(matchup_data, max_week) {
   return(median_leaderboard)
 }
 
+create_best_ball_leaderboard <- function(matchup_data, best_ball_matchup_data, max_week) {
+  # get current leaderboard
+  leaderboard <- create_leaderboard(matchup_data, max_week)
+
+  leaderboard <- leaderboard %>% rename(Rank_L = Rank) %>% select(Team, Rank_L)
+
+  # create leaderboard
+  leaderboard <- best_ball_matchup_data %>%
+    group_by(week, matchup_id) %>%
+    arrange(manager_id) %>%
+    mutate(other_team_points = case_when(
+      manager_id == unique(manager_id)[1] ~ lead(team_points, order_by = manager_id),
+      manager_id != unique(manager_id)[1] ~ lag(team_points, order_by = manager_id)
+    )) %>%
+    ungroup() %>%
+    filter(week <= max_week) %>%
+    group_by(team_name) %>%
+    reframe(
+      Team = team_name,
+      W = sum(winner),
+      L = n() - sum(winner),
+      PF = sum(team_points),
+      PA = sum(other_team_points)
+    ) %>%
+    distinct() %>%
+    arrange(desc(W), desc(PF)) %>%
+    mutate(Rank = row_number()) %>%
+    left_join(leaderboard, by = 'Team') %>%
+    mutate(Diff = Rank_L - Rank) %>%
+    select(Rank, Diff, Team, W, L, PF, PA)
+}

@@ -6,7 +6,7 @@ import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 
 CURRENT_YEAR = 23
-CURRENT_WEEK = 12
+CURRENT_WEEK = 14
 CURRENT_CHAMPION = "Just Joshin"
 MATT_S_TEAM_NAME = "Kirk Thuggins & the boys"
 matchups = [['Week', 'Champion', 'Opponent']]
@@ -88,7 +88,7 @@ def main():
                            graph_attr={'rankdir': 'LR'})
 
     tree, dot = build(CURRENT_CHAMPION, CURRENT_WEEK-1,
-                      CURRENT_WEEK + 2, schedule, dot, str(uuid.uuid1()))
+                      CURRENT_WEEK + 1, schedule, dot, str(uuid.uuid1()))
 
     dot.render("C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball" + str(CURRENT_YEAR) + "\\Week"+ str(CURRENT_WEEK-1) + "\\MotW_Next3", format='png')
     '''
