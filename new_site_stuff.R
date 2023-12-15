@@ -4,132 +4,132 @@ library(dplyr)
 library(tidyr)
 library(offensiveline)
 
+
+
 ##### New Site Stuff #####
 ###### Efficiency Data ######
-chart_data <- best_ball_matchups %>%
-  left_join(all_matchups, by = c('week', 'manager_id')) %>%
-  mutate(
-    max_points = team_points.x,
-    # Rename team_points.y to max_points
-    actual_points = team_points.y,
-    # Rename team_points.x to actual_points
-    team_name = team_name.x,
-    # Rename team_name.x to team_name
-    percentage = actual_points / max_points * 100
-  ) %>%
-  filter(week == current_week) %>%
-  arrange(desc(actual_points), desc(max_points)) %>%       # Sort by percentage in descending order
-  select(team_name, actual_points, max_points, percentage)
-
-# Assuming 'chart_data' is your dataframe
-json_data <- jsonlite::toJSON(chart_data, pretty = TRUE)
-
-# Copy the JSON data to the clipboard
-write_clip(json_data)
+# chart_data <- best_ball_matchups %>%
+#   left_join(all_matchups, by = c('week', 'manager_id')) %>%
+#   mutate(
+#     max_points = team_points.x,
+#     # Rename team_points.y to max_points
+#     actual_points = team_points.y,
+#     # Rename team_points.x to actual_points
+#     team_name = team_name.x,
+#     # Rename team_name.x to team_name
+#     percentage = actual_points / max_points * 100
+#   ) %>%
+#   filter(week == current_week) %>%
+#   arrange(desc(actual_points), desc(max_points)) %>%       # Sort by percentage in descending order
+#   select(team_name, actual_points, max_points, percentage)
+# 
+# # Assuming 'chart_data' is your dataframe
+# json_data <- jsonlite::toJSON(chart_data, pretty = TRUE)
+# 
+# # Copy the JSON data to the clipboard
+# write_clip(json_data)
 
 ###### Scoring Distribution ######
-matchup_data <- all_matchups
-
-matchup_data <- matchup_data %>% 
-  group_by(week) %>%
-  mutate(
-    Average = mean(team_points),
-    Median = median(team_points),
-    Maximum = max(team_points),
-    Minimum = min(team_points)
-  ) %>%
-  ungroup() %>%
-  left_join(team_photos) %>%
-  select(week, team_name, image_or_text, matchup_id, team_points, Average, Median, Maximum, Minimum)
-
-# Assuming 'chart_data' is your dataframe
-json_data <- jsonlite::toJSON(matchup_data, pretty = TRUE)
-
-# Copy the JSON data to the clipboard
-write_clip(json_data)
+# matchup_data <- all_matchups
+# 
+# matchup_data <- matchup_data %>% 
+#   group_by(week) %>%
+#   mutate(
+#     Average = mean(team_points),
+#     Median = median(team_points),
+#     Maximum = max(team_points),
+#     Minimum = min(team_points)
+#   ) %>%
+#   ungroup() %>%
+#   left_join(team_photos) %>%
+#   select(week, team_name, image_or_text, matchup_id, team_points, Average, Median, Maximum, Minimum)
+# 
+# # Assuming 'chart_data' is your dataframe
+# json_data <- jsonlite::toJSON(matchup_data, pretty = TRUE)
+# 
+# # Copy the JSON data to the clipboard
+# write_clip(json_data)
 
 ###### matchup plot ######
-all_starters <- na.omit(all_players[all_players$starter_id == 1,])
-all_starters <- all_starters[all_starters$week == current_week, ]
-
-# Group by team_name and summarize data
-grouped_data <- all_starters %>%
-  group_by(team_name, matchup_id) %>%
-  summarize(entries = list(
-    data.frame(
-      full_name = full_name,
-      position = position,
-      points = points
-    )
-  ))
-
-# Convert to JSON
-json_data <- jsonlite::toJSON(grouped_data, pretty = TRUE)
+# all_starters <- na.omit(all_players[all_players$starter_id == 1,])
+# all_starters <- all_starters[all_starters$week == current_week, ]
+# 
+# # Group by team_name and summarize data
+# grouped_data <- all_starters %>%
+#   group_by(team_name, matchup_id) %>%
+#   summarize(entries = list(
+#     data.frame(
+#       full_name = full_name,
+#       position = position,
+#       points = points
+#     )
+#   ))
+# 
+# # Convert to JSON
+# json_data <- jsonlite::toJSON(grouped_data, pretty = TRUE)
 
 # Copy the JSON data to the clipboard
 write_clip(json_data)
-
-
 
 ###### motw history table ######
-motw_table <- motw_data %>%
-  filter(motw == 1) %>%
-  group_by(week) %>%
-  arrange(matchup_id) %>%
-  reframe(
-    Week = week,
-    `Winner Team` = team_name[which.max(winner)],
-    `Winner Score` = max(team_points),
-    `Loser Score` = min(team_points),
-    `Loser Team` = team_name[which.min(winner)],
-    `# of Shots/Dogs` = `# of Shots`[which.min(winner)]
-  ) %>%
-  distinct() %>%
-  select(-week)
-
-# Function to generate color codes based on spec_color2
-spec_color2_scale <- function(x, scale_from, direction = 1) {
-  if (direction == -1) {
-    scale_from <- rev(scale_from)
-  }
-  
-  n <- length(custom_palette36)
-  x <- round(scales::rescale(x, to = c(1, n), from = scale_from))
-  color_code <- custom_palette36[x]
-  color_code[is.na(color_code)] <-
-    "#BBBBBB"  # Replace NA color as needed
-  return(color_code)
-}
-
-# Add color scale columns for Winner Score, Loser Score, and # of Shots/Dogs
-motw_table$WinnerScoreColor <- spec_color2_scale(motw_table$`Winner Score`,
-                                                 scale_from = c(
-                                                   min(all_matchups$team_points),
-                                                   max(all_matchups$team_points)
-                                                 ),
-                                                 direction = 1)
-
-motw_table$LoserScoreColor <- spec_color2_scale(motw_table$`Loser Score`,
-                                                scale_from = c(
-                                                  min(all_matchups$team_points),
-                                                  max(all_matchups$team_points)
-                                                ),
-                                                direction = 1)
-
-motw_table$ShotsDogsColor <- spec_color2_scale(
-  motw_table$`# of Shots/Dogs`,
-  scale_from = c(
-    min(motw_table$`# of Shots/Dogs`),
-    max(motw_table$`# of Shots/Dogs`)
-  ),
-  direction = -1
-)
-
-# Assuming 'motw_table' is your data frame
-json_data <- jsonlite::toJSON(motw_table, pretty = TRUE)
-
-# Copy the JSON data to the clipboard
-write_clip(json_data)
+# motw_table <- motw_data %>%
+#   filter(motw == 1) %>%
+#   group_by(week) %>%
+#   arrange(matchup_id) %>%
+#   reframe(
+#     Week = week,
+#     `Winner Team` = team_name[which.max(winner)],
+#     `Winner Score` = max(team_points),
+#     `Loser Score` = min(team_points),
+#     `Loser Team` = team_name[which.min(winner)],
+#     `# of Shots/Dogs` = `# of Shots`[which.min(winner)]
+#   ) %>%
+#   distinct() %>%
+#   select(-week)
+# 
+# # Function to generate color codes based on spec_color2
+# spec_color2_scale <- function(x, scale_from, direction = 1) {
+#   if (direction == -1) {
+#     scale_from <- rev(scale_from)
+#   }
+#   
+#   n <- length(custom_palette36)
+#   x <- round(scales::rescale(x, to = c(1, n), from = scale_from))
+#   color_code <- custom_palette36[x]
+#   color_code[is.na(color_code)] <-
+#     "#BBBBBB"  # Replace NA color as needed
+#   return(color_code)
+# }
+# 
+# # Add color scale columns for Winner Score, Loser Score, and # of Shots/Dogs
+# motw_table$WinnerScoreColor <- spec_color2_scale(motw_table$`Winner Score`,
+#                                                  scale_from = c(
+#                                                    min(all_matchups$team_points),
+#                                                    max(all_matchups$team_points)
+#                                                  ),
+#                                                  direction = 1)
+# 
+# motw_table$LoserScoreColor <- spec_color2_scale(motw_table$`Loser Score`,
+#                                                 scale_from = c(
+#                                                   min(all_matchups$team_points),
+#                                                   max(all_matchups$team_points)
+#                                                 ),
+#                                                 direction = 1)
+# 
+# motw_table$ShotsDogsColor <- spec_color2_scale(
+#   motw_table$`# of Shots/Dogs`,
+#   scale_from = c(
+#     min(motw_table$`# of Shots/Dogs`),
+#     max(motw_table$`# of Shots/Dogs`)
+#   ),
+#   direction = -1
+# )
+# 
+# # Assuming 'motw_table' is your data frame
+# json_data <- jsonlite::toJSON(motw_table, pretty = TRUE)
+# 
+# # Copy the JSON data to the clipboard
+# write_clip(json_data)
 
 ###### awards table ######
 awards_data <- create_awards_table(all_players, all_matchups, best_ball_matchups)
@@ -139,69 +139,69 @@ write_clip(jsonlite::toJSON(awards_data, pretty = TRUE))
 
 ###### shots dist ######
 # Filter data for losing teams
-losing_teams_data <- motw_data[motw_data$winner == 0,]
-
-# Create a data frame for Victory chart
-victory_data <- data.frame(x = losing_teams_data$`# of Shots`,
-                           group = ifelse(is.na(losing_teams_data$motw), 'Not MotW', 'MotW'))
-
-# Convert the data frame to a JSON string
-json_data <- toJSON(victory_data, pretty = TRUE)
-
-# Copy the JSON data to the clipboard
-write_clip(json_data)
+# losing_teams_data <- motw_data[motw_data$winner == 0,]
+# 
+# # Create a data frame for Victory chart
+# victory_data <- data.frame(x = losing_teams_data$`# of Shots`,
+#                            group = ifelse(is.na(losing_teams_data$motw), 'Not MotW', 'MotW'))
+# 
+# # Convert the data frame to a JSON string
+# json_data <- toJSON(victory_data, pretty = TRUE)
+# 
+# # Copy the JSON data to the clipboard
+# write_clip(json_data)
 
 
 
 ###### leaderboard ######
-leaderboard_data <- create_leaderboard(all_matchups, current_week)
-
-leaderboard_data$PFColor <- spec_color2_scale(
-  leaderboard_data$PF,
-  scale_from = c(
-    min(leaderboard_data$PF),
-    max(leaderboard_data$PF)
-  ),
-  direction = 1
-)
-
-leaderboard_data$PAColor <- spec_color2_scale(
-  leaderboard_data$PA,
-  scale_from = c(
-    min(leaderboard_data$PA),
-    max(leaderboard_data$PA)
-  ),
-  direction = -1
-)
-
-leaderboard_data <- leaderboard_data %>% left_join(team_photos, by = c("Team" = "team_name"))
-
-write_clip(toJSON(leaderboard_data, pretty = TRUE))
+# leaderboard_data <- create_leaderboard(all_matchups, current_week)
+# 
+# leaderboard_data$PFColor <- spec_color2_scale(
+#   leaderboard_data$PF,
+#   scale_from = c(
+#     min(leaderboard_data$PF),
+#     max(leaderboard_data$PF)
+#   ),
+#   direction = 1
+# )
+# 
+# leaderboard_data$PAColor <- spec_color2_scale(
+#   leaderboard_data$PA,
+#   scale_from = c(
+#     min(leaderboard_data$PA),
+#     max(leaderboard_data$PA)
+#   ),
+#   direction = -1
+# )
+# 
+# leaderboard_data <- leaderboard_data %>% left_join(team_photos, by = c("Team" = "team_name"))
+# 
+# write_clip(toJSON(leaderboard_data, pretty = TRUE))
 
 
 
 ###### power rankings ######
-power_ranking_data <- create_power_rankings(all_matchups, current_week, number_of_teams = 12)
-
-power_ranking_data$TaColor <- spec_color2_scale(
-  power_ranking_data$`Team Ability`,
-  scale_from = c(
-    min(power_ranking_data$`Team Ability`),
-    max(power_ranking_data$`Team Ability`)
-  ),
-  direction = 1
-)
-
-power_ranking_data$SosColor <- spec_color2_scale(
-  power_ranking_data$`Str of Sched`,
-  scale_from = c(
-    min(power_ranking_data$`Str of Sched`),
-    max(power_ranking_data$`Str of Sched`)
-  ),
-  direction = -1
-)
-
-write_clip(toJSON(power_ranking_data, pretty = TRUE))
+# power_ranking_data <- create_power_rankings(all_matchups, current_week, number_of_teams = 12)
+# 
+# power_ranking_data$TaColor <- spec_color2_scale(
+#   power_ranking_data$`Team Ability`,
+#   scale_from = c(
+#     min(power_ranking_data$`Team Ability`),
+#     max(power_ranking_data$`Team Ability`)
+#   ),
+#   direction = 1
+# )
+# 
+# power_ranking_data$SosColor <- spec_color2_scale(
+#   power_ranking_data$`Str of Sched`,
+#   scale_from = c(
+#     min(power_ranking_data$`Str of Sched`),
+#     max(power_ranking_data$`Str of Sched`)
+#   ),
+#   direction = -1
+# )
+# 
+# write_clip(toJSON(power_ranking_data, pretty = TRUE))
 
 
 
@@ -231,7 +231,6 @@ playoff_output[playoff_output[, 5] > 2 * (14 - current_week) + 1, 5] <- 'ELIMINA
 playoff_output[playoff_output[, 5] <= 0, 5] <- 'CLINCHED'
 playoff_output$`Last #` <- as.character(playoff_output$`Last #`)
 playoff_output[playoff_output[, 6] <= 0, 6] <- 'SAFE'
-# playoff_output[playoff_output[, 6] > 2 * (14 - current_week) + 1, 6] <- NA
 
 ###### Manual edit for playoff chances ######
 playoff_chances <- leaderboard[, 3]
