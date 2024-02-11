@@ -76,6 +76,20 @@ matchup_plot_to_json <- function(player_data, max_week) {
   return(json_data)
 }
 
+# Function to generate color codes based on spec_color2
+spec_color2_scale <- function(x, scale_from, direction = 1) {
+  if (direction == -1) {
+    scale_from <- rev(scale_from)
+  }
+
+  n <- length(custom_palette36)
+  x <- round(scales::rescale(x, to = c(1, n), from = scale_from))
+  color_code <- custom_palette36[x]
+  color_code[is.na(color_code)] <-
+    "#BBBBBB"  # Replace NA color as needed
+  return(color_code)
+}
+
 motw_table_to_json <- function(motw_data) {
   motw_table <- motw_data %>%
     filter(motw == 1) %>%
@@ -91,20 +105,6 @@ motw_table_to_json <- function(motw_data) {
     ) %>%
     distinct() %>%
     select(-week)
-
-  # Function to generate color codes based on spec_color2
-  spec_color2_scale <- function(x, scale_from, direction = 1) {
-    if (direction == -1) {
-      scale_from <- rev(scale_from)
-    }
-
-    n <- length(custom_palette36)
-    x <- round(scales::rescale(x, to = c(1, n), from = scale_from))
-    color_code <- custom_palette36[x]
-    color_code[is.na(color_code)] <-
-      "#BBBBBB"  # Replace NA color as needed
-    return(color_code)
-  }
 
   # Add color scale columns for Winner Score, Loser Score, and # of Shots/Dogs
   motw_table$WinnerScoreColor <- spec_color2_scale(motw_table$`Winner Score`,

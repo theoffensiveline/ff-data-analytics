@@ -41,13 +41,16 @@ add_motw_to_matchups <-
           filter(week == week_num, motw == 1) %>%
           pull(matchup_id)
 
-        # assign motw to the losers opponent
-        matchup_data <- matchup_data %>%
-          mutate(motw = ifelse(
-            week == week_num & matchup_id == this_week_matchup_id,
-            1,
-            motw
-          ))
+        # Check if this_week_matchup_id is not empty before attempting mutate
+        if (!is.null(this_week_matchup_id) && length(this_week_matchup_id) > 0) {
+          # assign motw to the losers opponent
+          matchup_data <- matchup_data %>%
+            mutate(motw = ifelse(
+              week == week_num & matchup_id == this_week_matchup_id,
+              1,
+              motw
+            ))
+        }
       }
     }
     shots_data <- player_data %>%
@@ -59,6 +62,7 @@ add_motw_to_matchups <-
       matchup_data %>% left_join(shots_data, by = c("week", "manager_id"))
     return(output_data)
   }
+
 
 
 #' Title Create MotW Table

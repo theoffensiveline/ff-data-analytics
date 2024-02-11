@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 996445270105714688 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 14 #NFL_state$display_week
+current_week <- 17 #NFL_state$display_week
 current_year <- 23
 
 # team photos
@@ -33,8 +33,14 @@ all_players <- get_all_matchups_data(current_week,
                                      league_id,
                                      sleeper_players_csv)
 
+# get rid of NA
+all_players <- all_players[complete.cases(all_players$matchup_id), ]
+
 # summarize to the team level
 all_matchups <- get_team_matchups(player_data = all_players)
+
+# get rid of NA
+all_matchups <- all_matchups[complete.cases(all_matchups$matchup_id), ]
 
 # get MotW data
 motw_data <- add_motw_to_matchups(

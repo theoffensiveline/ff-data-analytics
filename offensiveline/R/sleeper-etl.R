@@ -64,7 +64,7 @@ get_week_matchup_data <- function(week_number, league_id) {
   rosters <- get_rosters(league_id)
 
   # select relevant columns
-  filtered_rosters <- rosters[,c('roster_id', 'owner_id')]
+  filtered_rosters <- rosters[, c('roster_id', 'owner_id')]
 
   # get user info for the league
   users <- get_league_users(league_id)
@@ -72,23 +72,27 @@ get_week_matchup_data <- function(week_number, league_id) {
   # select relevant columns and fill null teams names with display names
   filtered_users <- data.frame(
     owner_id = users$user_id,
-    team_name = ifelse(is.na(users$metadata$team_name), users$display_name, users$metadata$team_name)
+    team_name = ifelse(
+      is.na(users$metadata$team_name),
+      users$display_name,
+      users$metadata$team_name
+    )
   )
 
   # merge roster data and team name data
-  team_names_by_id <- merge(x = filtered_rosters, y = filtered_users, by = 'owner_id')
+  team_names_by_id <-
+    merge(x = filtered_rosters, y = filtered_users, by = 'owner_id')
 
   # add a column to identify the winner of each matchup
   cleaned_matchups <- matchups %>%
     arrange(matchup_id, points) %>%
     group_by(matchup_id) %>%
-    mutate(winner = case_when(
-      points == max(points) ~ 1,
-      TRUE ~ 0
-    ))
+    mutate(winner = case_when(points == max(points) ~ 1,
+                              TRUE ~ 0))
 
   # join team names to matchup data
-  cleaned_matchups <- merge(x = cleaned_matchups, y = team_names_by_id, by = 'roster_id')
+  cleaned_matchups <-
+    merge(x = cleaned_matchups, y = team_names_by_id, by = 'roster_id')
 
   # add a column that has the week
   cleaned_matchups$week <- week_number
@@ -109,17 +113,14 @@ get_all_starters_data <- function(max_week, league_id) {
   all_data <- data.frame() # Initialize an empty data frame
 
   for (week in 1:max_week) {
-    week_data <- get_week_matchup_data(week, league_id) # Collect data for the current week
+    week_data <-
+      get_week_matchup_data(week, league_id) # Collect data for the current week
 
     week_data <- data.frame(
-      week = rep(
-        week_data$week,
-        sapply(week_data$starters, length)
-      ),
-      manager_id = rep(
-        week_data$roster_id,
-        sapply(week_data$starters, length)
-      ),
+      week = rep(week_data$week,
+                 sapply(week_data$starters, length)),
+      manager_id = rep(week_data$roster_id,
+                       sapply(week_data$starters, length)),
       starters = unlist(week_data$starters)
     )
 
@@ -144,59 +145,68 @@ get_all_starters_data <- function(max_week, league_id) {
 get_all_matchups_data <- function(max_week, league_id, file_path) {
   all_data <- data.frame()
 
-  player_data <- get_players_data(update_players = FALSE, file_path = file_path)
+  player_data <-
+    get_players_data(update_players = FALSE, file_path = file_path)
 
   for (week in 1:max_week) {
-    week_data <- get_week_matchup_data(week, league_id) # Collect data for the current week
+    week_data <-
+      get_week_matchup_data(week, league_id) # Collect data for the current week
 
     week_data_clean <- data.frame(
-      week = rep(
-        week_data$week,
-        sapply(week_data$players, length)
-      ),
-      matchup_id = rep(
-        week_data$matchup_id,
-        sapply(week_data$players, length)
-      ),
-      manager_id = rep(
-        week_data$roster_id,
-        sapply(week_data$players, length)
-      ),
-      team_name = rep(
-        week_data$team_name,
-        sapply(week_data$players, length)
-      ),
-      winner = rep(
-        week_data$winner,
-        sapply(week_data$players, length)
-      ),
-      team_points = rep(
-        week_data$points,
-        sapply(week_data$players, length)
-      ),
+      week = rep(week_data$week,
+                 sapply(week_data$players, length)),
+      matchup_id = rep(week_data$matchup_id,
+                       sapply(week_data$players, length)),
+      manager_id = rep(week_data$roster_id,
+                       sapply(week_data$players, length)),
+      team_name = rep(week_data$team_name,
+                      sapply(week_data$players, length)),
+      winner = rep(week_data$winner,
+                   sapply(week_data$players, length)),
+      team_points = rep(week_data$points,
+                        sapply(week_data$players, length)),
       players = unlist(week_data$players)
     )
 
-    player_pts <- gather(week_data$players_points, key = 'player_id', value = 'points')
+    player_pts <-
+      gather(week_data$players_points,
+             key = 'player_id',
+             value = 'points')
 
     player_pts <- player_pts %>%
       filter(!is.na(points))
 
-    week_data_clean <- merge(week_data_clean, player_pts, by.x = 'players', by.y = 'player_id')
+    week_data_clean <-
+      merge(week_data_clean,
+            player_pts,
+            by.x = 'players',
+            by.y = 'player_id')
 
-    all_data <- rbind(all_data, week_data_clean) # Concatenate the data
+    all_data <-
+      rbind(all_data, week_data_clean) # Concatenate the data
   }
 
-  all_data <- merge(x = all_data, y = player_data,
-                    by.x = "players", by.y = "player_id")
+  all_data <- merge(
+    x = all_data,
+    y = player_data,
+    by.x = "players",
+    by.y = "player_id"
+  )
 
   starter_data <- get_all_starters_data(max_week, league_id)
 
-  all_data <- merge(x = all_data, y = starter_data,
-                    by.x = c("players", "manager_id", "week"), by.y = c("starters", "manager_id", "week"),
-                    all.x = TRUE)
+  all_data <- merge(
+    x = all_data,
+    y = starter_data,
+    by.x = c("players", "manager_id", "week"),
+    by.y = c("starters", "manager_id", "week"),
+    all.x = TRUE
+  )
 
-  all_data$full_name <- ifelse(is.na(all_data$full_name), all_data$players, all_data$full_name)
+  all_data$full_name <-
+    ifelse(is.na(all_data$full_name),
+           all_data$players,
+           all_data$full_name)
 
   return(all_data)
 }
@@ -229,9 +239,85 @@ get_team_photos <- function(league_id) {
 
   # Apply the function to create a new column with image URLs or team names
   filtered_users$image_or_text <-
-    mapply(get_image_or_text, filtered_users$avatar, filtered_users$team_name)
+    mapply(get_image_or_text,
+           filtered_users$avatar,
+           filtered_users$team_name)
 
   return(filtered_users)
 }
 
+
+get_all_transaction_data <- function(max_week, league_id) {
+  all_data <- data.frame() # Initialize an empty data frame
+
+  for (week in 1:max_week) {
+    week_data <-
+      get_transactions(league_id, week) # Collect data for the current week
+
+    result_df <- data.frame()
+
+    # Iterate through each row of the transactions dataframe
+    for (i in seq_len(nrow(week_data))) {
+      # Extract information from the adds dataframe
+      adds_df <- week_data$adds[i, ]
+
+      # If adds_df is not NULL and not an empty dataframe, proceed with iteration
+      if (!is.null(adds_df) &&
+          ncol(adds_df) > 0 && nrow(adds_df) > 0) {
+        # Iterate through each column of the adds dataframe
+        for (player_id in intersect(names(adds_df), colnames(adds_df))) {
+          # Ignore NA values
+          if (!is.na(adds_df[[player_id]])) {
+            # Create a new row with player_id, manager_id, type, and status
+            new_row <- data.frame(
+              week = week,
+              trans_id = week_data$transaction_id[i],
+              player_id = as.integer(player_id),
+              # Convert player_id to integer
+              manager_id = adds_df[[player_id]],
+              type = week_data$type[i],
+              status = week_data$status[i],
+              add_drop = 'add'
+            )
+
+            # Append the new row to the result dataframe
+            result_df <- rbind(result_df, new_row)
+          }
+        }
+      }
+
+      # Extract information from the drops dataframe
+      drops_df <- week_data$drops[i, ]
+
+      # If drops_df is not NULL and not an empty dataframe, proceed with iteration
+      if (!is.null(drops_df) &&
+          ncol(drops_df) > 0 && nrow(drops_df) > 0) {
+        # Iterate through each column of the drops dataframe
+        for (player_id in intersect(names(drops_df), colnames(drops_df))) {
+          # Ignore NA values
+          if (!is.na(drops_df[[player_id]])) {
+            # Create a new row with player_id, manager_id, type, and status
+            new_row <- data.frame(
+              week = week,
+              trans_id = week_data$transaction_id[i],
+              player_id = as.integer(player_id),
+              # Convert player_id to integer
+              manager_id = drops_df[[player_id]],
+              type = week_data$type[i],
+              status = week_data$status[i],
+              add_drop = 'drop'
+            )
+
+            # Append the new row to the result dataframe
+            result_df <- rbind(result_df, new_row)
+          }
+        }
+      }
+    }
+
+    all_data <- rbind(all_data, result_df) # Concatenate the data
+  }
+
+  return(all_data)
+}
 
