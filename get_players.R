@@ -2,6 +2,7 @@
 
 ##### I will probably run this file once a week to fetch players #####
 library(offensiveline)
+library(sleeperapi)
 
 sleeper_players_csv <- "sleeper_players.csv"
 
