@@ -50,6 +50,8 @@ motw_data <- add_motw_to_matchups(
   player_data = all_players
 )
 
+full_schedule <- schedule
+
 ##### data outputs #####
 
 # awardsTable.json
@@ -214,7 +216,7 @@ write_json_to_file(starters_json, starters_file_path)
 #   color_2 = "#7D8491"
 # )
 # 
-# # motw data for python scripts - need to clean up
+# motw data for python scripts - need to clean up
 # full_season_player_data <-
 #   get_all_matchups_data(14, league_id, sleeper_players_csv)
 # full_season_schedule <- get_team_matchups(full_season_player_data)
@@ -239,7 +241,7 @@ write_json_to_file(starters_json, starters_file_path)
 # motw_schedule_output
 # 
 # write_csv(motw_schedule_output,
-#           "currentMotW/schedule23.csv",
+#           "currentMotW/schedule24.csv",
 #           col_names = FALSE)
 # 
 # # run python script for MotW data - don't forget to edit first
@@ -247,9 +249,37 @@ write_json_to_file(starters_json, starters_file_path)
 # 
 # danger_table <- create_danger_table()
 # 
+# # Identify columns to process (exclude 'Team')
+# columns_to_process <- setdiff(names(danger_table), 'Team')
+# 
+# # Dynamically add color columns for each column except 'Team'
+# for (col in columns_to_process) {
+#   color_col_name <- paste0(col, "_color")
+#   min_val <- min(danger_table[[col]], na.rm = TRUE)
+#   max_val <- max(danger_table[[col]], na.rm = TRUE)
+#   
+#   # Determine direction based on column name if needed
+#   direction <- if (col %in% c("NPG")) 1 else -1  # Example direction logic
+#   danger_table[[color_col_name]] <- spec_color2_scale(danger_table[[col]],
+#                                                       scale_from = c(min_val, max_val),
+#                                                       direction = direction)
+# }
+# 
+# danger_table_json <- jsonlite::toJSON(danger_table, pretty = TRUE)
+# 
+# # dangerTable.json
+# danger_table_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week,
+#   file_name = "dangerTable.json"
+# )
+# write_json_to_file(danger_table_json, danger_table_file_path)
+# 
 # danger_chart <- create_danger_chart()
 # 
-# 
+# full_season_motw_schedule <- full_season_motw_schedule %>%
+#   mutate(motw_prob = )
+
 # ##### need to clean up #####
 # 
 # ###### Create Playoff Board ######

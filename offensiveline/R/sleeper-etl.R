@@ -190,8 +190,6 @@ get_all_matchups_data <- function(max_week, league_id, file_path) {
                    values_to = 'player_points') %>%
       select(owner_id, player_id, points = player_points)
 
-    print(player_pts)
-
     player_pts <- player_pts %>%
       filter(!is.na(points)) %>%
       left_join(player_nicknames, by = c('player_id', 'owner_id'))

@@ -208,7 +208,7 @@ create_awards_table <-
         photo = team_photos[team_photos$team_name == least_bench_points$team_name, "image_or_text"],
         name = least_bench_points$team_name,
         value = sprintf('Left %s points on the bench', least_bench_points$points_on_bench),
-        description = sprintf('This is the #%s optimized lineup this season', least_bench_points$most_bench_pts_rank)))
+        description = sprintf('This is the #%s optimized lineup this season', least_bench_points$least_bench_pts_rank)))
 
     ###### MVP and Bench MVP Award ######
     # get MVP data and award entry

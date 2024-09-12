@@ -1,4 +1,7 @@
-awards_to_json <- function(matchup_data, player_data, max_week, team_photos) {
+awards_to_json <- function(matchup_data,
+                           player_data,
+                           max_week,
+                           team_photos) {
   best_ball_lineups <- calc_best_ball_lineups(player_data, max_week)
 
   best_ball_matchups <- create_best_ball_matchups(optimal_lineups = best_ball_lineups)
@@ -47,7 +50,17 @@ matchup_info_to_json <- function(matchup_data) {
     ) %>%
     ungroup() %>%
     left_join(team_photos) %>%
-    select(week, team_name, image_or_text, matchup_id, team_points, Average, Median, Maximum, Minimum)
+    select(
+      week,
+      team_name,
+      image_or_text,
+      matchup_id,
+      team_points,
+      Average,
+      Median,
+      Maximum,
+      Minimum
+    )
 
   # Assuming 'chart_data' is your dataframe
   json_data <- jsonlite::toJSON(matchup_data, pretty = TRUE)
@@ -56,7 +69,7 @@ matchup_info_to_json <- function(matchup_data) {
 }
 
 matchup_plot_to_json <- function(player_data, max_week) {
-  all_starters <- player_data[!is.na(player_data$starter_id),]
+  all_starters <- player_data[!is.na(player_data$starter_id), ]
   all_starters <- all_starters[all_starters$week == max_week, ]
 
   # Group by team_name and summarize data
@@ -65,6 +78,7 @@ matchup_plot_to_json <- function(player_data, max_week) {
     summarize(entries = list(
       data.frame(
         full_name = full_name,
+        nickname = nickname,
         position = position,
         points = points
       )
@@ -107,19 +121,23 @@ motw_table_to_json <- function(motw_data) {
     select(-week)
 
   # Add color scale columns for Winner Score, Loser Score, and # of Shots/Dogs
-  motw_table$WinnerScoreColor <- spec_color2_scale(motw_table$`Winner Score`,
-                                                   scale_from = c(
-                                                     min(all_matchups$team_points),
-                                                     max(all_matchups$team_points)
-                                                   ),
-                                                   direction = 1)
+  motw_table$WinnerScoreColor <- spec_color2_scale(
+    motw_table$`Winner Score`,
+    scale_from = c(
+      min(all_matchups$team_points),
+      max(all_matchups$team_points)
+    ),
+    direction = 1
+  )
 
-  motw_table$LoserScoreColor <- spec_color2_scale(motw_table$`Loser Score`,
-                                                  scale_from = c(
-                                                    min(all_matchups$team_points),
-                                                    max(all_matchups$team_points)
-                                                  ),
-                                                  direction = 1)
+  motw_table$LoserScoreColor <- spec_color2_scale(
+    motw_table$`Loser Score`,
+    scale_from = c(
+      min(all_matchups$team_points),
+      max(all_matchups$team_points)
+    ),
+    direction = 1
+  )
 
   motw_table$ShotsDogsColor <- spec_color2_scale(
     motw_table$`# of Shots/Dogs`,
@@ -138,7 +156,7 @@ motw_table_to_json <- function(motw_data) {
 
 shots_dist_to_json <- function(motw_data) {
   # Filter data for losing teams
-  losing_teams_data <- motw_data[motw_data$winner == 0,]
+  losing_teams_data <- motw_data[motw_data$winner == 0, ]
 
   # Create a data frame for Victory chart
   victory_data <- data.frame(x = losing_teams_data$`# of Shots`,
@@ -153,23 +171,13 @@ shots_dist_to_json <- function(motw_data) {
 leaderboard_to_json <- function(matchup_data, max_week, team_photos) {
   leaderboard_data <- create_leaderboard(matchup_data, max_week)
 
-  leaderboard_data$PFColor <- spec_color2_scale(
-    leaderboard_data$PF,
-    scale_from = c(
-      min(leaderboard_data$PF),
-      max(leaderboard_data$PF)
-    ),
-    direction = 1
-  )
+  leaderboard_data$PFColor <- spec_color2_scale(leaderboard_data$PF,
+                                                scale_from = c(min(leaderboard_data$PF), max(leaderboard_data$PF)),
+                                                direction = 1)
 
-  leaderboard_data$PAColor <- spec_color2_scale(
-    leaderboard_data$PA,
-    scale_from = c(
-      min(leaderboard_data$PA),
-      max(leaderboard_data$PA)
-    ),
-    direction = -1
-  )
+  leaderboard_data$PAColor <- spec_color2_scale(leaderboard_data$PA,
+                                                scale_from = c(min(leaderboard_data$PA), max(leaderboard_data$PA)),
+                                                direction = -1)
 
   leaderboard_data <- leaderboard_data %>% left_join(team_photos, by = c("Team" = "team_name"))
 
@@ -207,23 +215,13 @@ power_rankings_to_json <- function(matchup_data, max_week) {
 median_lb_to_json <- function(matchup_data, max_week) {
   median_lb_data <- create_median_leaderboard(matchup_data, max_week)
 
-  median_lb_data$PFColor <- spec_color2_scale(
-    median_lb_data$PF,
-    scale_from = c(
-      min(median_lb_data$PF),
-      max(median_lb_data$PF)
-    ),
-    direction = 1
-  )
+  median_lb_data$PFColor <- spec_color2_scale(median_lb_data$PF,
+                                              scale_from = c(min(median_lb_data$PF), max(median_lb_data$PF)),
+                                              direction = 1)
 
-  median_lb_data$PAColor <- spec_color2_scale(
-    median_lb_data$PA,
-    scale_from = c(
-      min(median_lb_data$PA),
-      max(median_lb_data$PA)
-    ),
-    direction = -1
-  )
+  median_lb_data$PAColor <- spec_color2_scale(median_lb_data$PA,
+                                              scale_from = c(min(median_lb_data$PA), max(median_lb_data$PA)),
+                                              direction = -1)
 
   json_data <- jsonlite::toJSON(median_lb_data, pretty = TRUE)
 
@@ -238,9 +236,7 @@ best_ball_lb_to_json <- function(matchup_data, player_data, max_week) {
     create_best_ball_matchups(optimal_lineups = best_ball_lineups)
 
   best_ball_leaderboard <-
-    create_best_ball_leaderboard(matchup_data,
-                                 best_ball_matchups,
-                                 max_week)
+    create_best_ball_leaderboard(matchup_data, best_ball_matchups, max_week)
 
   best_ball_leaderboard$PFColor <- spec_color2_scale(
     best_ball_leaderboard$PF,
@@ -285,7 +281,14 @@ schedule_comparison_to_json <- function(matchup_data, team_photos) {
   records_list <- list()
 
   # Initialize team_records data frame
-  team_records <- data.frame(team1 = character(), team2 = character(), wins = numeric(), losses = numeric(), ties = numeric(), stringsAsFactors = FALSE)
+  team_records <- data.frame(
+    team1 = character(),
+    team2 = character(),
+    wins = numeric(),
+    losses = numeric(),
+    ties = numeric(),
+    stringsAsFactors = FALSE
+  )
 
   for (team in team_list) {
     # get team scores for each week
@@ -307,8 +310,7 @@ schedule_comparison_to_json <- function(matchup_data, team_photos) {
 
       for (i in 1:nrow(merged_scores)) {
         if ((merged_scores$matchup_id.x[i] == merged_scores$matchup_id.y[i]) &
-            (team != team2)
-        ) {
+            (team != team2)) {
           if (merged_scores$team_points.x[i] > merged_scores$team_points.y[i]) {
             wins <- wins + 1
           } else if (merged_scores$team_points.x[i] < merged_scores$team_points.y[i]) {
@@ -327,7 +329,13 @@ schedule_comparison_to_json <- function(matchup_data, team_photos) {
         }
       }
       # Append record to list of records as a data frame
-      record <- data.frame(team1 = as.character(team), team2 = as.character(team2), wins = wins, losses = losses, ties = ties)
+      record <- data.frame(
+        team1 = as.character(team),
+        team2 = as.character(team2),
+        wins = wins,
+        losses = losses,
+        ties = ties
+      )
       records_list <- c(records_list, list(record))
     }
   }
@@ -338,18 +346,22 @@ schedule_comparison_to_json <- function(matchup_data, team_photos) {
   best_records <- team_records %>%
     group_by(team1) %>%
     filter(wins == max(wins)) %>%
-    summarize(team2_list = list(team2),
-              wins = max(wins),
-              losses = max(losses),
-              ties = max(ties))
+    summarize(
+      team2_list = list(team2),
+      wins = max(wins),
+      losses = max(losses),
+      ties = max(ties)
+    )
 
   worst_records <- team_records %>%
     group_by(team1) %>%
     filter(wins == min(wins)) %>%
-    summarize(team2_list = list(team2),
-              wins = max(wins),
-              losses = max(losses),
-              ties = max(ties))
+    summarize(
+      team2_list = list(team2),
+      wins = max(wins),
+      losses = max(losses),
+      ties = max(ties)
+    )
 
   current_records <- team_records %>%
     filter(team1 == team2) %>%
@@ -367,7 +379,10 @@ schedule_comparison_to_json <- function(matchup_data, team_photos) {
   return(json_data)
 }
 
-generate_file_path <- function(base_path = "C:/Users/Trevor/Documents/Fantasy Football/theoffensiveline-site/src/newsletters/20", current_year, current_week, file_name) {
+generate_file_path <- function(base_path = "C:/Users/Trevor/Documents/Fantasy Football/theoffensiveline-site/src/newsletters/20",
+                               current_year,
+                               current_week,
+                               file_name) {
   paste0(base_path, current_year, " Week ", current_week, "/", file_name)
 }
 

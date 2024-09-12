@@ -5,10 +5,9 @@ import uuid
 import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 
-CURRENT_YEAR = 23
-CURRENT_WEEK = 14
-CURRENT_CHAMPION = "Just Joshin"
-MATT_S_TEAM_NAME = "Kirk Thuggins & the boys"
+CURRENT_YEAR = 24
+CURRENT_WEEK = 2
+CURRENT_CHAMPION = "Questionable"
 matchups = [['Week', 'Champion', 'Opponent']]
 
 
@@ -45,7 +44,7 @@ def build(name, week, last_week, schedule, dot, my_uuid):
 
 def make_schedule_map():
     schedule = dict()
-    with open('currentMotW/schedule23.csv', newline='') as csvfile:
+    with open('currentMotW/schedule24.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             week = int(row[0])
@@ -74,39 +73,17 @@ def main():
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
         wr.writerows(matchups)
 
-    # # near future
-    # dot = graphviz.Digraph(comment='Matchup of the Week',
-    #                        graph_attr={'rankdir': 'LR'})
-    # 
-    # tree, dot = build(CURRENT_CHAMPION, CURRENT_WEEK-1,
-    #                   CURRENT_WEEK + 2, schedule, dot, str(uuid.uuid1()))
-    # 
-    # dot.render("MotW_Next3")
-    
     # near future png for newspaper
     dot = graphviz.Digraph(comment='Matchup of the Week',
                            graph_attr={'rankdir': 'LR'})
 
     tree, dot = build(CURRENT_CHAMPION, CURRENT_WEEK-1,
-                      CURRENT_WEEK + 1, schedule, dot, str(uuid.uuid1()))
+                      CURRENT_WEEK + 2, schedule, dot, str(uuid.uuid1()))
 
-    dot.render("C:\\Users\\Trevor\\Documents\\Website\\public\\FantasyFootball" + str(CURRENT_YEAR) + "\\Week"+ str(CURRENT_WEEK-1) + "\\MotW_Next3", format='png')
-    '''
-    # history
-    dot = graphviz.Digraph(comment='Matchup of the Week')
-
-    tree, dot = build(MATT_S_TEAM_NAME, 0, CURRENT_WEEK -
-                      1, schedule, dot, str(uuid.uuid1()))
-
-    dot.render("MotW_History")
-
-    # full
-    dot = graphviz.Digraph(comment='Matchup of the Week')
-
-    tree, dot = build(MATT_S_TEAM_NAME, 2, 13, schedule, dot, str(uuid.uuid1()))
-
-    dot.render("MotW_Full")
-    '''
+    # Use raw string for the file path to avoid issues with backslashes
+    path = r"C:\\Users\\Trevor\\Documents\\Fantasy Football\\theoffensiveline-site\\src\\newsletters\\20" + str(CURRENT_YEAR) + " Week " + str(CURRENT_WEEK-1) + r"\\motwFuture"
+    dot.render(path, format='png', cleanup=True)
+    
     del matchups[1:]
     
     # left tree
