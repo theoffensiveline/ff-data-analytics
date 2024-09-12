@@ -83,7 +83,7 @@ create_weekly_scoring_chart <- function(matchup_data, max_week) {
       by = 15
     )) +
     labs(title = 'Weekly Scoring', x = 'Week', y = 'Points') +
-    scale_colour_manual(values = c("#20A4F4", "#668F80", "#7E6551", "#FF3366"))
+    scale_colour_manual(values = c("#227740", "#668F80", "#7E6551", "#bc293d"))
 
   return(weekly_scoring_plot)
 }
@@ -175,8 +175,8 @@ create_efficiency_plot <-
         stat = "identity",
         position = "identity",
         alpha = .8,
-        fill = '#20A4F4',
-        color = '#20A4F4'
+        fill = '#227740',
+        color = '#227740'
       ) +
       labs(x = 'Team', y = 'Points') +
       coord_flip() +
@@ -367,7 +367,7 @@ create_PF_PA_scatter <- function(leaderboard, team_photos) {
       geom = "richtext",
       x = plyr::round_any(min(df$PF), 50, floor),
       y = plyr::round_any(min(df$PA), 50, floor),
-      label = "<span style='color: #20A4F4;'>Lucky</span> and <span style='color: #FF3366;'>Bad</span>",
+      label = "<span style='color: #227740;'>Lucky</span> and <span style='color: #bc293d;'>Bad</span>",
       hjust = 0,
       vjust = 0
     ) +
@@ -375,7 +375,7 @@ create_PF_PA_scatter <- function(leaderboard, team_photos) {
       geom = "richtext",
       x = plyr::round_any(max(df$PF), 50, ceiling),
       y = plyr::round_any(min(df$PA), 50, floor),
-      label = "<span style='color: #20A4F4;'>Lucky</span> and <span style='color: #20A4F4;'>Good</span>",
+      label = "<span style='color: #227740;'>Lucky</span> and <span style='color: #227740;'>Good</span>",
       hjust = 1,
       vjust = 0
     ) +
@@ -383,7 +383,7 @@ create_PF_PA_scatter <- function(leaderboard, team_photos) {
       geom = "richtext",
       x = plyr::round_any(min(df$PF), 50, floor),
       y = plyr::round_any(max(df$PA), 50, ceiling),
-      label = "<span style='color: #FF3366;'>Unlucky</span> and <span style='color: #FF3366;'>Bad</span>",
+      label = "<span style='color: #bc293d;'>Unlucky</span> and <span style='color: #bc293d;'>Bad</span>",
       hjust = 0,
       vjust = 1
     ) +
@@ -391,7 +391,7 @@ create_PF_PA_scatter <- function(leaderboard, team_photos) {
       geom = "richtext",
       x = plyr::round_any(max(df$PF), 50, ceiling),
       y = plyr::round_any(max(df$PA), 50, ceiling),
-      label = "<span style='color: #FF3366;'>Unlucky</span> and <span style='color: #20A4F4;'>Good</span>",
+      label = "<span style='color: #bc293d;'>Unlucky</span> and <span style='color: #227740;'>Good</span>",
       hjust = 1,
       vjust = 1
     )
@@ -418,7 +418,7 @@ create_rank_chart <- function(matchup_data, team_photos) {
       data = subset(df, winner == 1),
       # Add green tiles for winner == 1
       aes(x = week, y = rank, label = 'W'),
-      color = "#20A4F4",
+      color = "#227740",
       size = 4,
       nudge_x = 0.45
     ) +
@@ -426,7 +426,7 @@ create_rank_chart <- function(matchup_data, team_photos) {
       data = subset(df, winner == 0),
       # Add red tiles for winner == 0
       aes(x = week, y = rank, label = 'L'),
-      color = "#FF3366",
+      color = "#bc293d",
       size = 4,
       nudge_x = 0.45
     ) +

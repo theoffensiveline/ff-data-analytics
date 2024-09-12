@@ -275,13 +275,13 @@ playoff_output$LastColor <- spec_color2_scale(
 
 playoff_output$PlayoffMagicColor <- ifelse(
   playoff_output$`Play-off #` == "CLINCHED",
-  '#20A4F4',
-  ifelse(playoff_output$`Play-off #` == "ELIMINATED", '#FF3366', 'white'))
+  '#227740',
+  ifelse(playoff_output$`Play-off #` == "ELIMINATED", '#bc293d', 'white'))
 
 playoff_output$LastMagicColor <- ifelse(
   playoff_output$`Last #` == "SAFE",
-  '#20A4F4',
-  ifelse(is.na(playoff_output$`Last #`), '#FF3366', 'white'))
+  '#227740',
+  ifelse(is.na(playoff_output$`Last #`), '#bc293d', 'white'))
 
 write_clip(toJSON(playoff_output, pretty = TRUE))
 
