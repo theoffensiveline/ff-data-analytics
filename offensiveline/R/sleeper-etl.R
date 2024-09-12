@@ -73,9 +73,9 @@ get_week_matchup_data <- function(week_number, league_id) {
   filtered_users <- data.frame(
     owner_id = users$user_id,
     team_name = ifelse(
-      is.na(users$metadata$team_name),
+      is.na(users$team_name),
       users$display_name,
-      users$metadata$team_name
+      users$team_name
     )
   )
 
@@ -148,6 +148,21 @@ get_all_matchups_data <- function(max_week, league_id, file_path) {
   player_data <-
     get_players_data(update_players = FALSE, file_path = file_path)
 
+  # Get the rosters for the league
+  rosters <- get_rosters(league_id)
+
+  # get player nicknames from rosters
+  player_nicknames <- rosters %>%
+    pivot_longer(
+      cols = starts_with("p_nick_"),
+      names_to = "player_id",
+      values_to = "nickname",
+      names_transform = list(player_id = ~ sub("p_nick_", "", .))  # Remove the prefix
+    ) %>%
+    select(owner_id, player_id, nickname) %>%
+    filter(!is.na(nickname)) %>%
+    filter(nickname != "")
+
   for (week in 1:max_week) {
     week_data <-
       get_week_matchup_data(week, league_id) # Collect data for the current week
@@ -169,12 +184,17 @@ get_all_matchups_data <- function(max_week, league_id, file_path) {
     )
 
     player_pts <-
-      gather(week_data$players_points,
-             key = 'player_id',
-             value = 'points')
+      pivot_longer(week_data,
+                   cols = c(-roster_id, -points, -players, -custom_points, -matchup_id, -starters, -starters_points, -winner, -owner_id, -team_name, -week),
+                   names_to = 'player_id',
+                   values_to = 'player_points') %>%
+      select(owner_id, player_id, points = player_points)
+
+    print(player_pts)
 
     player_pts <- player_pts %>%
-      filter(!is.na(points))
+      filter(!is.na(points)) %>%
+      left_join(player_nicknames, by = c('player_id', 'owner_id'))
 
     week_data_clean <-
       merge(week_data_clean,
@@ -230,17 +250,17 @@ get_team_matchups <- function(player_data) {
 get_team_photos <- function(league_id) {
   # get user info for the league
   users <- get_league_users(league_id)
-  filtered_users <- users$metadata %>% select(team_name, avatar)
+  filtered_users <- users %>% select(team_name, avatar_upload)
 
   # Define a function to fetch image or use team_name as text
-  get_image_or_text <- function(avatar, team_name) {
-    return(ifelse(is.na(avatar), team_name, avatar))
+  get_image_or_text <- function(avatar_upload, team_name) {
+    return(ifelse(is.na(avatar_upload), team_name, avatar_upload))
   }
 
   # Apply the function to create a new column with image URLs or team names
   filtered_users$image_or_text <-
     mapply(get_image_or_text,
-           filtered_users$avatar,
+           filtered_users$avatar_upload,
            filtered_users$team_name)
 
   return(filtered_users)

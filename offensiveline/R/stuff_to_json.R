@@ -1,9 +1,9 @@
-awards_to_json <- function(matchup_data, player_data, max_week) {
+awards_to_json <- function(matchup_data, player_data, max_week, team_photos) {
   best_ball_lineups <- calc_best_ball_lineups(player_data, max_week)
 
   best_ball_matchups <- create_best_ball_matchups(optimal_lineups = best_ball_lineups)
 
-  awards_data <- create_awards_table(player_data, matchup_data, best_ball_matchups)
+  awards_data <- create_awards_table(player_data, matchup_data, best_ball_matchups, team_photos)
 
   json_data <- jsonlite::toJSON(awards_data, pretty = TRUE)
 
@@ -56,7 +56,7 @@ matchup_info_to_json <- function(matchup_data) {
 }
 
 matchup_plot_to_json <- function(player_data, max_week) {
-  all_starters <- na.omit(player_data[player_data$starter_id == 1,])
+  all_starters <- player_data[!is.na(player_data$starter_id),]
   all_starters <- all_starters[all_starters$week == max_week, ]
 
   # Group by team_name and summarize data

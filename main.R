@@ -19,11 +19,11 @@ library(rcartocolor)
 
 # Define the league ID, sleeper players file, and get NFL state
 # league_id <- 968890022248103936 # Walter league
-league_id <- 996445270105714688 # main league
+league_id <- 1124831356770058240 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 17 #NFL_state$display_week
-current_year <- 23
+current_week <- 1 #NFL_state$display_week
+current_year <- 24
 
 # team photos
 team_photos <- get_team_photos(league_id)
@@ -53,7 +53,7 @@ motw_data <- add_motw_to_matchups(
 ##### data outputs #####
 
 # awardsTable.json
-awards_json <- awards_to_json(all_matchups, all_players, current_week)
+awards_json <- awards_to_json(all_matchups, all_players, current_week, team_photos)
 awards_file_path <- generate_file_path(
   current_year = current_year, 
   current_week = current_week, 
