@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 1124831356770058240 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 2 #NFL_state$display_week
+current_week <- 5 #NFL_state$display_week
 current_year <- 24
 
 # team photos
@@ -118,7 +118,7 @@ write_json_to_file(motw_json, motw_file_path)
 # playoffTable.json
 
 # powerRankings.json
-power_rankings_json <- power_rankings_to_json(all_matchups, current_week)
+power_rankings_json <- power_rankings_to_json(all_matchups, current_week, 12)
 power_rankings_file_path <- generate_file_path(
   current_year = current_year, 
   current_week = current_week,

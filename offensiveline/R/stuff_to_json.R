@@ -186,8 +186,8 @@ leaderboard_to_json <- function(matchup_data, max_week, team_photos) {
   return(json_data)
 }
 
-power_rankings_to_json <- function(matchup_data, max_week) {
-  power_ranking_data <- create_power_rankings(matchup_data, max_week, number_of_teams = 12)
+power_rankings_to_json <- function(matchup_data, max_week, number_of_teams) {
+  power_ranking_data <- create_power_rankings(matchup_data, max_week, number_of_teams)
 
   power_ranking_data$TaColor <- spec_color2_scale(
     power_ranking_data$`Team Ability`,
