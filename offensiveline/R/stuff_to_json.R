@@ -49,6 +49,11 @@ matchup_info_to_json <- function(matchup_data) {
       Minimum = min(team_points)
     ) %>%
     ungroup() %>%
+    group_by(week, matchup_id) %>%
+    mutate(
+      margin_of_victory = (max(team_points) - min(team_points)) * if_else(winner == 0, -1, 1)
+    ) %>%
+    ungroup() %>%
     left_join(team_photos) %>%
     select(
       week,
@@ -56,11 +61,36 @@ matchup_info_to_json <- function(matchup_data) {
       image_or_text,
       matchup_id,
       team_points,
+      margin_of_victory,
       Average,
       Median,
       Maximum,
       Minimum
     )
+
+  # Separate positive and negative values of margin_of_victory
+  positive_mov <- matchup_data$margin_of_victory[matchup_data$margin_of_victory > 0]
+  negative_mov <- matchup_data$margin_of_victory[matchup_data$margin_of_victory < 0]
+
+  # Initialize the mov_color column with NA
+  matchup_data$mov_color <- NA
+
+  # Apply spec_color2_scale for positive margin_of_victory
+  matchup_data$mov_color[matchup_data$margin_of_victory > 0] <- spec_color2_scale(
+    positive_mov,
+    scale_from = c(min(positive_mov), max(positive_mov)),
+    direction = -1
+  )
+
+  # Apply spec_color2_scale for negative margin_of_victory
+  matchup_data$mov_color[matchup_data$margin_of_victory < 0] <- spec_color2_scale(
+    negative_mov,
+    scale_from = c(min(negative_mov), max(negative_mov)),
+    direction = -1
+  )
+
+  # Set mov_color to #ECECDF if the absolute value of margin_of_victory is greater than 10
+  matchup_data$mov_color[abs(matchup_data$margin_of_victory) > 10] <- "#ECECDF"
 
   # Assuming 'chart_data' is your dataframe
   json_data <- jsonlite::toJSON(matchup_data, pretty = TRUE)

@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 1124831356770058240 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 5 #NFL_state$display_week
+current_week <- 8 #NFL_state$display_week
 current_year <- 24
 
 # team photos
@@ -49,8 +49,6 @@ motw_data <- add_motw_to_matchups(
   max_week = current_week,
   player_data = all_players
 )
-
-full_schedule <- schedule
 
 ##### data outputs #####
 
@@ -274,11 +272,6 @@ danger_table_file_path <- generate_file_path(
   file_name = "dangerTable.json"
 )
 write_json_to_file(danger_table_json, danger_table_file_path)
-# 
-# danger_chart <- create_danger_chart()
-# 
-# full_season_motw_schedule <- full_season_motw_schedule %>%
-#   mutate(motw_prob = )
 
 # ##### need to clean up #####
 # 

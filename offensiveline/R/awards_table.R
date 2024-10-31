@@ -16,28 +16,33 @@ find_top_player <- function(pos, data, current_week) {
     filter(week == current_week) %>%
     slice_max(order_by = points)
 
-  player_name <-
-    if (pos == 'DEF') {
-      result$players
-    } else {
-      result$full_name
-    }
+  # Vectorized handling of multiple players
+  player_name <- if (pos == 'DEF') {
+    result$players
+  } else {
+    result$full_name
+  }
+
   manager <- result$team_name
   player_points <- result$points
   player_rank <- result$rank
+
+  # Construct player photo URLs, vectorized
   player_photo <- if (pos == "DEF") {
     paste0("https://sleepercdn.com/images/team_logos/nfl/", tolower(result$players), ".png")
   } else {
     paste0("https://sleepercdn.com/content/nfl/players/", result$players, ".jpg")
   }
+
+  # Handle nicknames vectorized
   player_nickname <- result$nickname
-
-  player_name <- if (!is.null(player_nickname) && !is.na(player_nickname) && player_nickname != "") {
-    paste(player_name, " (", player_nickname, ")", sep = "")
-  } else {
+  player_name <- ifelse(
+    !is.na(player_nickname) & player_nickname != "",
+    paste(player_name, " (", player_nickname, ")", sep = ""),
     player_name
-  }
+  )
 
+  # Return a list of all tied players
   return(
     list(
       player_name = player_name,
@@ -61,24 +66,28 @@ find_top_player <- function(pos, data, current_week) {
 #'
 #' @examples top_player_award("QB", player_data, 2, "Anti-Russ")
 top_player_award <- function(pos, data, current_week, award_name) {
-  top_player <- find_top_player(pos, data, current_week)
+  top_players <- find_top_player(pos, data, current_week)
 
-  award <- c(
-    award = award_name,
-    photo = top_player$player_photo,
-    name = top_player$player_name,
-    value = sprintf('Scored %s points for %s',
-                    top_player$player_points,
-                    top_player$manager
-    ),
-    description = sprintf(
-      'This is the #%s %s performance of the season',
-      top_player$player_rank,
-      pos
-    )
+  # Create a list of awards for each player (to handle ties)
+  awards <- mapply(
+    function(player_name, player_photo, player_points, player_rank, manager) {
+      list(
+        award = award_name,
+        photo = player_photo,
+        name = player_name,
+        value = sprintf('Scored %s points for %s', player_points, manager),
+        description = sprintf('This is the #%s %s performance of the season', player_rank, pos)
+      )
+    },
+    player_name = top_players$player_name,
+    player_photo = top_players$player_photo,
+    player_points = top_players$player_points,
+    player_rank = top_players$player_rank,
+    manager = top_players$manager,
+    SIMPLIFY = FALSE  # Return a list of awards, not a matrix
   )
 
-  return(award)
+  return(awards)
 }
 
 create_awards_table <-
@@ -267,73 +276,38 @@ create_awards_table <-
 
 
     ###### Best Players ######
-    # find the best QB this week
-    awards <- rbind(
-      awards,
-      top_player_award(
-        pos = "QB",
-        data = player_data,
-        current_week = current_week,
-        award_name = "Literally Throwing"
-      )
+    # Define the positions and their corresponding award names
+    positions_awards <- list(
+      QB = "Literally Throwing",
+      RB = "Running Wild",
+      WR = "Widest Receiver",
+      TE = "Tightest End",
+      K  = "Das Boot",
+      DEF = "Biggest D"
     )
 
-    # find the best RB this week
-    awards <- rbind(
-      awards,
-      top_player_award(
-        pos = "RB",
+    # Loop through each position and apply the `top_player_award` function
+    for (pos in names(positions_awards)) {
+      pos_awards <- top_player_award(
+        pos = pos,
         data = player_data,
         current_week = current_week,
-        award_name = "Running Wild"
+        award_name = positions_awards[[pos]]
       )
-    )
 
-    # find the best WR this week
-    awards <- rbind(
-      awards,
-      top_player_award(
-        pos = "WR",
-        data = player_data,
-        current_week = current_week,
-        award_name = "Widest Receiver"
-      )
-    )
+      # If there are multiple awards for a position, append numbers (1, 2, 3, etc.) to the name
+      for (i in seq_along(pos_awards)) {
+        award <- pos_awards[[i]]
 
-    # find the best TE this week
-    awards <- rbind(
-      awards,
-      top_player_award(
-        pos = "TE",
-        data = player_data,
-        current_week = current_week,
-        award_name = "Tighest End"
-      )
-    )
+        # Append a number to the award name if there are multiple awards for the position
+        if (length(pos_awards) > 1) {
+          award$award <- paste(award$award, i)
+        }
 
-
-    # find the best K this week
-    awards <- rbind(
-      awards,
-      top_player_award(
-        pos = "K",
-        data = player_data,
-        current_week = current_week,
-        award_name = "Das Boot"
-      )
-    )
-
-
-    # find the best DEF this week
-    awards <- rbind(
-      awards,
-      top_player_award(
-        pos = "DEF",
-        data = player_data,
-        current_week = current_week,
-        award_name = "Biggest D"
-      )
-    )
+        # Add the award to the main awards list
+        awards <- rbind(awards, award)
+      }
+    }
 
     return(awards)
   }
