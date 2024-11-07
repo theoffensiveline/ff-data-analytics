@@ -53,19 +53,19 @@ playoff_output <- playoff_output %>%
 ###### Manual edit for playoff chances ######
 playoff_chances <- leaderboard_data[, 3]
 playoff_chances
-playoff_chances$`Play-off %` <- c(98.81,
-                                  98.76,
-                                  94.23,
-                                  76.1,
-                                  59.2,
-                                  65.35,
-                                  55.22,
-                                  21.07,
-                                  12.92,
-                                  14.46,
-                                  2.37,
-                                  1.51)
-playoff_chances$`Last %` <- c(0.01, 0.01, 0.01, 0.35, 0.4, 0.41, 0.69, 2.11, 7.29, 6.01, 40.14, 42.59)
+playoff_chances$`Play-off %` <- c(98.46,
+                                  95.79,
+                                  84.17,
+                                  79.98,
+                                  75.51,
+                                  30.05,
+                                  53.10,
+                                  36.22,
+                                  25.40,
+                                  5.75,
+                                  7.23,
+                                  8.34)
+playoff_chances$`Last %` <- c(0.01, 0.02, 0.22, 0.18, 0.51, 2.93, 2.99, 4.29, 7.42, 27.37, 32.87, 21.20)
 
 playoff_output <- merge(playoff_output, playoff_chances)
 
@@ -104,163 +104,162 @@ playoff_output$LastMagicColor <- ifelse(
 
 write_clip(toJSON(playoff_output, pretty = TRUE))
 
-
-###### median and best ball ######
-median_lb_data <- create_median_leaderboard(all_matchups, current_week)
-
-median_lb_data$PFColor <- spec_color2_scale(
-  median_lb_data$PF,
-  scale_from = c(
-    min(median_lb_data$PF),
-    max(median_lb_data$PF)
-  ),
-  direction = 1
-)
-
-median_lb_data$PAColor <- spec_color2_scale(
-  median_lb_data$PA,
-  scale_from = c(
-    min(median_lb_data$PA),
-    max(median_lb_data$PA)
-  ),
-  direction = -1
-)
-
-write_clip(toJSON(median_lb_data, pretty = TRUE))
-
-
-# create best ball data and outputs
-best_ball_lineups <-
-  calc_best_ball_lineups(player_data = all_players,
-                         max_week = current_week)
-
-best_ball_matchups <-
-  create_best_ball_matchups(optimal_lineups = best_ball_lineups)
-
-best_ball_leaderboard <-
-  create_best_ball_leaderboard(matchup_data = all_matchups,
-                               best_ball_matchup_data = best_ball_matchups,
-                               max_week = current_week)
-
-best_ball_leaderboard$PFColor <- spec_color2_scale(
-  best_ball_leaderboard$PF,
-  scale_from = c(
-    min(best_ball_leaderboard$PF),
-    max(best_ball_leaderboard$PF)
-  ),
-  direction = 1
-)
-
-best_ball_leaderboard$PAColor <- spec_color2_scale(
-  best_ball_leaderboard$PA,
-  scale_from = c(
-    min(best_ball_leaderboard$PA),
-    max(best_ball_leaderboard$PA)
-  ),
-  direction = -1
-)
-
-write_clip(toJSON(best_ball_leaderboard, pretty = TRUE))
-
-
-
-###### schedule comparison ######
-
-your_data <- matchup_data %>%
-  select(week, team_name, image_or_text, matchup_id, team_points) %>%
-  group_by(week, matchup_id) %>%
-  arrange(team_name) %>%
-  mutate(other_team_points = case_when(
-    team_name == unique(team_name)[1] ~ lead(team_points, order_by = team_name),
-    team_name != unique(team_name)[1] ~ lag(team_points, order_by = team_name)
-  )) %>%
-  ungroup()
-
-team_list <- unique(your_data$team_name)
-
-records_list <- list()
-
-# Initialize team_records data frame
-team_records <- data.frame(team1 = character(), team2 = character(), wins = numeric(), losses = numeric(), ties = numeric(), stringsAsFactors = FALSE)
-
-for (team in team_list) {
-  # get team scores for each week
-  team_scores <- your_data %>% 
-    filter(team_name == team) %>% 
-    select(week, team_points, matchup_id)
-  
-  for (team2 in team_list) {
-    # Initialize wins, losses, ties inside the inner loop
-    wins <- 0
-    losses <- 0
-    ties <- 0
-    
-    opponent_scores <- your_data %>%
-      filter(team_name == team2) %>%
-      select(week, team_points, other_team_points, matchup_id)
-    
-    merged_scores <- merge(team_scores, opponent_scores, by = "week")
-    
-    print(merged_scores)
-    
-    for (i in 1:nrow(merged_scores)) {
-      if ((merged_scores$matchup_id.x[i] == merged_scores$matchup_id.y[i]) & 
-          (team != team2)
-          ) {
-        if (merged_scores$team_points.x[i] > merged_scores$team_points.y[i]) {
-          wins <- wins + 1
-        } else if (merged_scores$team_points.x[i] < merged_scores$team_points.y[i]) {
-          losses <- losses + 1
-        } else {
-          ties <- ties + 1
-        }
-      } else {
-        if (merged_scores$team_points.x[i] > merged_scores$other_team_points[i]) {
-          wins <- wins + 1
-        } else if (merged_scores$team_points.x[i] < merged_scores$other_team_points[i]) {
-          losses <- losses + 1
-        } else {
-          ties <- ties + 1
-        }
-      }
-    }
-    # Append record to list of records as a data frame
-    record <- data.frame(team1 = as.character(team), team2 = as.character(team2), wins = wins, losses = losses, ties = ties)
-    records_list <- c(records_list, list(record))
-  }
-}
-
-# Convert the list of records to a data frame using bind_rows
-team_records <- bind_rows(records_list)
-
-# Display the resulting data frame
-team_records
-
-best_records <- team_records %>% 
-  group_by(team1) %>%
-  filter(wins == max(wins)) %>%
-  summarize(team2_list = list(team2),
-            wins = max(wins),
-            losses = max(losses),
-            ties = max(ties))
-
-worst_records <- team_records %>%
-  group_by(team1) %>%
-  filter(wins == min(wins)) %>%
-  summarize(team2_list = list(team2),
-            wins = max(wins),
-            losses = max(losses),
-            ties = max(ties))
-
-current_records <- team_records %>%
-  filter(team1 == team2) %>%
-  select(team1, wins, losses, ties)
-
-# Combine records into a list
-combined_list <- list(
-  best_records = best_records,
-  worst_records = worst_records,
-  current_records = current_records
-)
-
-write_clip(toJSON(combined_list, pretty = TRUE))
+# ###### median and best ball ######
+# median_lb_data <- create_median_leaderboard(all_matchups, current_week)
+# 
+# median_lb_data$PFColor <- spec_color2_scale(
+#   median_lb_data$PF,
+#   scale_from = c(
+#     min(median_lb_data$PF),
+#     max(median_lb_data$PF)
+#   ),
+#   direction = 1
+# )
+# 
+# median_lb_data$PAColor <- spec_color2_scale(
+#   median_lb_data$PA,
+#   scale_from = c(
+#     min(median_lb_data$PA),
+#     max(median_lb_data$PA)
+#   ),
+#   direction = -1
+# )
+# 
+# write_clip(toJSON(median_lb_data, pretty = TRUE))
+# 
+# 
+# # create best ball data and outputs
+# best_ball_lineups <-
+#   calc_best_ball_lineups(player_data = all_players,
+#                          max_week = current_week)
+# 
+# best_ball_matchups <-
+#   create_best_ball_matchups(optimal_lineups = best_ball_lineups)
+# 
+# best_ball_leaderboard <-
+#   create_best_ball_leaderboard(matchup_data = all_matchups,
+#                                best_ball_matchup_data = best_ball_matchups,
+#                                max_week = current_week)
+# 
+# best_ball_leaderboard$PFColor <- spec_color2_scale(
+#   best_ball_leaderboard$PF,
+#   scale_from = c(
+#     min(best_ball_leaderboard$PF),
+#     max(best_ball_leaderboard$PF)
+#   ),
+#   direction = 1
+# )
+# 
+# best_ball_leaderboard$PAColor <- spec_color2_scale(
+#   best_ball_leaderboard$PA,
+#   scale_from = c(
+#     min(best_ball_leaderboard$PA),
+#     max(best_ball_leaderboard$PA)
+#   ),
+#   direction = -1
+# )
+# 
+# write_clip(toJSON(best_ball_leaderboard, pretty = TRUE))
+# 
+# 
+# 
+# ###### schedule comparison ######
+# 
+# your_data <- matchup_data %>%
+#   select(week, team_name, image_or_text, matchup_id, team_points) %>%
+#   group_by(week, matchup_id) %>%
+#   arrange(team_name) %>%
+#   mutate(other_team_points = case_when(
+#     team_name == unique(team_name)[1] ~ lead(team_points, order_by = team_name),
+#     team_name != unique(team_name)[1] ~ lag(team_points, order_by = team_name)
+#   )) %>%
+#   ungroup()
+# 
+# team_list <- unique(your_data$team_name)
+# 
+# records_list <- list()
+# 
+# # Initialize team_records data frame
+# team_records <- data.frame(team1 = character(), team2 = character(), wins = numeric(), losses = numeric(), ties = numeric(), stringsAsFactors = FALSE)
+# 
+# for (team in team_list) {
+#   # get team scores for each week
+#   team_scores <- your_data %>% 
+#     filter(team_name == team) %>% 
+#     select(week, team_points, matchup_id)
+#   
+#   for (team2 in team_list) {
+#     # Initialize wins, losses, ties inside the inner loop
+#     wins <- 0
+#     losses <- 0
+#     ties <- 0
+#     
+#     opponent_scores <- your_data %>%
+#       filter(team_name == team2) %>%
+#       select(week, team_points, other_team_points, matchup_id)
+#     
+#     merged_scores <- merge(team_scores, opponent_scores, by = "week")
+#     
+#     print(merged_scores)
+#     
+#     for (i in 1:nrow(merged_scores)) {
+#       if ((merged_scores$matchup_id.x[i] == merged_scores$matchup_id.y[i]) & 
+#           (team != team2)
+#           ) {
+#         if (merged_scores$team_points.x[i] > merged_scores$team_points.y[i]) {
+#           wins <- wins + 1
+#         } else if (merged_scores$team_points.x[i] < merged_scores$team_points.y[i]) {
+#           losses <- losses + 1
+#         } else {
+#           ties <- ties + 1
+#         }
+#       } else {
+#         if (merged_scores$team_points.x[i] > merged_scores$other_team_points[i]) {
+#           wins <- wins + 1
+#         } else if (merged_scores$team_points.x[i] < merged_scores$other_team_points[i]) {
+#           losses <- losses + 1
+#         } else {
+#           ties <- ties + 1
+#         }
+#       }
+#     }
+#     # Append record to list of records as a data frame
+#     record <- data.frame(team1 = as.character(team), team2 = as.character(team2), wins = wins, losses = losses, ties = ties)
+#     records_list <- c(records_list, list(record))
+#   }
+# }
+# 
+# # Convert the list of records to a data frame using bind_rows
+# team_records <- bind_rows(records_list)
+# 
+# # Display the resulting data frame
+# team_records
+# 
+# best_records <- team_records %>% 
+#   group_by(team1) %>%
+#   filter(wins == max(wins)) %>%
+#   summarize(team2_list = list(team2),
+#             wins = max(wins),
+#             losses = max(losses),
+#             ties = max(ties))
+# 
+# worst_records <- team_records %>%
+#   group_by(team1) %>%
+#   filter(wins == min(wins)) %>%
+#   summarize(team2_list = list(team2),
+#             wins = max(wins),
+#             losses = max(losses),
+#             ties = max(ties))
+# 
+# current_records <- team_records %>%
+#   filter(team1 == team2) %>%
+#   select(team1, wins, losses, ties)
+# 
+# # Combine records into a list
+# combined_list <- list(
+#   best_records = best_records,
+#   worst_records = worst_records,
+#   current_records = current_records
+# )
+# 
+# write_clip(toJSON(combined_list, pretty = TRUE))
