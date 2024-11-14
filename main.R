@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 1124831356770058240 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 9 #NFL_state$display_week
+current_week <- 10 #NFL_state$display_week
 current_year <- 24
 
 # team photos
@@ -335,36 +335,109 @@ write_json_to_file(danger_table_json, danger_table_file_path)
 # 
 # 
 # 
-# # transactions <- get_transactions(league_id, 11)
-# # 
-# # transactions[transactions$type == 'trade', c('type', 'status')]
-# # 
-# # yahoo_trans <- read.csv("C:/Users/Trevor/Documents/Fantasy Football/transactions.csv")
-# # 
-# # yahoo_trades <- yahoo_trans[yahoo_trans$type == 'trade',]
-# # 
-# # yahoo_trades$week <- yahoo_trades$week_idx - 35
-# # 
-# # yahoo_trades %>%
-# #   mutate(veto_id = case_when(ts %in% 
-# #                                c('11/10/2022, 20:05:26',
-# #                                  '10/25/2022, 20:28:13',
-# #                                  '10/13/2022, 15:15:37',
-# #                                  '10/13/2022, 13:48:34',
-# #                                  '10/13/2022, 09:54:58',
-# #                                  '10/12/2022, 08:49:01',
-# #                                  '10/11/2022, 19:14:50') ~ 1,
-# #                              TRUE ~ 0)) %>%
-# #   group_by(type, week, veto_id) %>%
-# #   summarize(count_distinct_ts = n_distinct(ts))
-# # 
-# # 
-# # trades_by_week <- data.frame(week = c(1:12), 
-# #                                      sleeper_trades = c(0,1,1,1,1,0,1,0,3,0,4,0),
-# #                                      yahoo_trades = c(0,0,1,1,0,2,0,3,3,3,3,1),
-# #                                      vetoed_yahoo_trades = c(0,0,0,0,0,5,0,1,0,0,1,0)
-# #                                      )
-# # 
+transactions <- get_transactions(league_id, 7)
+
+transactions[transactions$type == 'trade', c('type', 'status')]
+
+trades <- transactions[transactions$type == 'trade',]
+
+trades <- trades[, colSums(is.na(trades)) < nrow(trades)]
+
+# Identify non-player columns
+non_player_columns <- c("status", "type", "created", "leg", "draft_picks", "creator", 
+                        "transaction_id", "consenter_ids", "roster_ids", "status_updated", 
+                        "waiver_budget", "is_counter", "expires_at")
+
+# Filter rows where all columns, except the non-player columns, are NA
+trades %>% filter(across(-all_of(non_player_columns), ~ is.na(.)))
+
+# yahoo_trans <- read.csv("C:/Users/Trevor/Documents/Fantasy Football/transactions.csv")
+# 
+# yahoo_trades <- yahoo_trans[yahoo_trans$type == 'trade',]
+# 
+# yahoo_trades$week <- yahoo_trades$week_idx - 35
+# 
+# yahoo_trades %>%
+#   mutate(veto_id = case_when(ts %in%
+#                                c('11/10/2022, 20:05:26',
+#                                  '10/25/2022, 20:28:13',
+#                                  '10/13/2022, 15:15:37',
+#                                  '10/13/2022, 13:48:34',
+#                                  '10/13/2022, 09:54:58',
+#                                  '10/12/2022, 08:49:01',
+#                                  '10/11/2022, 19:14:50') ~ 1,
+#                              TRUE ~ 0)) %>%
+#   group_by(type, week, veto_id) %>%
+#   summarize(count_distinct_ts = n_distinct(ts))
+
+# Initialize a data frame to store the results
+result <- data.frame(week = integer(0), 
+                     total_trades = integer(0), 
+                     trades_all_na_players = integer(0))
+
+# Loop over weeks 1 to 11
+for (week in 1:11) {
+  
+  # Get transactions for the current week (replace get_transactions with your actual function)
+  transactions <- get_transactions(league_id, week)
+  
+  # Filter trades
+  trades <- transactions[transactions$type == 'trade',]
+  
+  # Remove columns where all values are NA
+  trades <- trades[, colSums(is.na(trades)) < nrow(trades)]
+  
+  # Define the non-player columns to exclude
+  non_player_columns <- c("status", "type", "created", "leg", "draft_picks", "creator", 
+                          "transaction_id", "consenter_ids", "roster_ids", "status_updated", 
+                          "waiver_budget", "is_counter", "expires_at")
+  
+  # Keep only columns that exist in the current data
+  non_player_columns <- non_player_columns[non_player_columns %in% colnames(trades)]
+  
+  # Filter rows where all columns except non-player columns are NA
+  trades_all_na_players <- trades %>%
+    filter(across(-all_of(non_player_columns), ~ is.na(.)))
+  
+  # Store the results for the current week
+  result <- rbind(result, data.frame(
+    week = week,
+    total_trades = nrow(trades),
+    trades_all_na_players = nrow(trades_all_na_players)
+  ))
+}
+
+# View the result
+print(result)
+
+
+trades_by_week <- data.frame(week = c(1:12),
+                                     sleeper_trades_2024 = c(0,0,0,3,0,2,9,3,2,4,0,NA),
+                                     non_faab_sleeper_2024 = c(0,0,0,3,0,0,5,3,2,3,0,NA),
+                                     sleeper_trades_2023 = c(0,1,1,1,1,0,1,0,3,0,4,0),
+                                     yahoo_trades = c(0,0,1,1,0,2,0,3,3,3,3,1),
+                                     vetoed_yahoo_trades = c(0,0,0,0,0,5,0,1,0,0,1,0)
+                                     )
+
+# Calculate cumulative sums, treating NAs as zeros for the cumulative calculation
+trades_by_week_cumulative <- trades_by_week
+trades_by_week_cumulative$sleeper_trades_2024 <- cumsum(ifelse(is.na(trades_by_week$sleeper_trades_2024), 0, trades_by_week$sleeper_trades_2024))
+trades_by_week_cumulative$non_faab_sleeper_2024 <- cumsum(ifelse(is.na(trades_by_week$non_faab_sleeper_2024), 0, trades_by_week$non_faab_sleeper_2024))
+trades_by_week_cumulative$sleeper_trades_2023 <- cumsum(trades_by_week$sleeper_trades_2023)
+trades_by_week_cumulative$yahoo_trades <- cumsum(trades_by_week$yahoo_trades)
+trades_by_week_cumulative$vetoed_yahoo_trades <- cumsum(trades_by_week$vetoed_yahoo_trades)
+
+# Convert to JSON format
+trades_by_week_json <- toJSON(trades_by_week_cumulative, pretty = TRUE)
+
+# dangerTable.json
+trades_by_week_file_path <- generate_file_path(
+  current_year = current_year,
+  current_week = current_week,
+  file_name = "tradeHistory.json"
+)
+write_json_to_file(trades_by_week_json, trades_by_week_file_path)
+
 # # # Assuming your data frame is named 'trades_by_week'
 # # trades_by_week_plot <- ggplot(trades_by_week, aes(x = week)) +
 # #   geom_line(aes(y = cumsum(yahoo_trades), color = "Yahoo Trades"), size = 1.2) +

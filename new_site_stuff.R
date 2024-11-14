@@ -53,19 +53,19 @@ playoff_output <- playoff_output %>%
 ###### Manual edit for playoff chances ######
 playoff_chances <- leaderboard_data[, 3]
 playoff_chances
-playoff_chances$`Play-off %` <- c(98.46,
-                                  95.79,
-                                  84.17,
-                                  79.98,
-                                  75.51,
-                                  30.05,
-                                  53.10,
-                                  36.22,
-                                  25.40,
-                                  5.75,
-                                  7.23,
-                                  8.34)
-playoff_chances$`Last %` <- c(0.01, 0.02, 0.22, 0.18, 0.51, 2.93, 2.99, 4.29, 7.42, 27.37, 32.87, 21.20)
+playoff_chances$`Play-off %` <- c(97.95,
+                                  96.25,
+                                  87.73,
+                                  59.13,
+                                  69.99,
+                                  58.39,
+                                  60.91,
+                                  46.16,
+                                  11.46,
+                                  8.58,
+                                  2,
+                                  1.45)
+playoff_chances$`Last %` <- c(0.01, 0.01, 0.01, 0.07, 0.44, 0.48, 0.61, 0.87, 6.77, 9.88, 28.3, 52.58)
 
 playoff_output <- merge(playoff_output, playoff_chances)
 
