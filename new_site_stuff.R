@@ -12,8 +12,8 @@ leaderboard_data <- create_leaderboard(all_matchups, current_week)
 ###### Create Playoff Board ######
 playoff_output <- leaderboard_data[, c(1, 3, 4, 5)]
 playoff_output$last_losses <- max(playoff_output$L)
-playoff_output$max_losses_top6 <- playoff_output[6, 4]
-playoff_output$max_losses_bottom6 <- playoff_output[7, 4]
+playoff_output$max_losses_top6 <- playoff_output[7, 4]
+playoff_output$max_losses_bottom6 <- playoff_output[6, 4]
 
 # Helper Columns for Play-off #
 playoff_output$`Play-off #` <- NA  # Initialize with NA
@@ -42,8 +42,8 @@ playoff_output <- playoff_output %>%
   )
 
 # Coalesce final results into the desired columns
-playoff_output$`Play-off #` <- coalesce(playoff_output$playoff_eliminated, playoff_output$`Play-off #`)
-playoff_output$`Last #` <- coalesce(playoff_output$last_safe, playoff_output$`Last #`)
+playoff_output$`Play-off #` <- coalesce(playoff_output$playoff_eliminated, playoff_output$playoff_clinched, as.character( playoff_output$`Play-off #`))
+playoff_output$`Last #` <- coalesce(playoff_output$last_safe, as.character(playoff_output$`Last #`))
 
 # Optionally drop helper columns if no longer needed
 playoff_output <- playoff_output %>%
@@ -53,24 +53,36 @@ playoff_output <- playoff_output %>%
 ###### Manual edit for playoff chances ######
 playoff_chances <- leaderboard_data[, 3]
 playoff_chances
-playoff_chances$`Play-off %` <- c(97.95,
-                                  96.25,
-                                  87.73,
-                                  59.13,
-                                  69.99,
-                                  58.39,
-                                  60.91,
-                                  46.16,
-                                  11.46,
-                                  8.58,
-                                  2,
-                                  1.45)
-playoff_chances$`Last %` <- c(0.01, 0.01, 0.01, 0.07, 0.44, 0.48, 0.61, 0.87, 6.77, 9.88, 28.3, 52.58)
+playoff_chances$`Play-off %` <- c(100,
+                                  100,
+                                  100,
+                                  100,
+                                  63.63,
+                                  56.58,
+                                  34.95,
+                                  44.58,
+                                  0.26,
+                                  0,
+                                  0,
+                                  0)
+playoff_chances$`WP Playoff %` <- c(100,
+                             100,
+                             100,
+                             84,
+                             46,
+                             63,
+                             34,
+                             62,
+                             10,
+                             0,
+                             0,
+                             0)
+playoff_chances$`Last %` <- c(0,0,0,0,0,0,0,0,0,0,33.17,66.83)
 
 playoff_output <- merge(playoff_output, playoff_chances)
 
 playoff_output <-
-  playoff_output[order(playoff_output$Rank), c(2, 1, 3, 4, 7, 5, 8, 6)]
+  playoff_output[order(playoff_output$Rank), c(2, 1, 3, 4, 7, 8, 5, 9, 6)]
 
 row.names(playoff_output) <- NULL
 
@@ -79,6 +91,15 @@ playoff_output$PlayoffColor <- spec_color2_scale(
   scale_from = c(
     min(playoff_output$`Play-off %`),
     max(playoff_output$`Play-off %`)
+  ),
+  direction = 1
+)
+
+playoff_output$WPPlayoffColor <- spec_color2_scale(
+  playoff_output$`WP Playoff %`,
+  scale_from = c(
+    min(playoff_output$`WP Playoff %`),
+    max(playoff_output$`WP Playoff %`)
   ),
   direction = 1
 )
@@ -95,12 +116,12 @@ playoff_output$LastColor <- spec_color2_scale(
 playoff_output$PlayoffMagicColor <- ifelse(
   playoff_output$`Play-off #` == "CLINCHED",
   '#227740',
-  ifelse(playoff_output$`Play-off #` == "ELIMINATED", '#bc293d', NULL))
+  ifelse(playoff_output$`Play-off #` == "ELIMINATED", '#bc293d', NA))
 
 playoff_output$LastMagicColor <- ifelse(
   playoff_output$`Last #` == "SAFE",
   '#227740',
-  ifelse(is.na(playoff_output$`Last #`), '#bc293d', NULL))
+  ifelse(is.na(playoff_output$`Last #`), '#bc293d', NA))
 
 write_clip(toJSON(playoff_output, pretty = TRUE))
 

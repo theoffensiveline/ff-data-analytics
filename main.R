@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 1124831356770058240 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 10 #NFL_state$display_week
+current_week <- 13 #NFL_state$display_week
 current_year <- 24
 
 # team photos
@@ -115,7 +115,7 @@ write_json_to_file(motw_json, motw_file_path)
 
 # playoffTable.json
 # run new_site_stuff.R first to get playoff_output
-playoff_table_json <- toJSON(playoff_output, pretty = TRUE)
+playoff_table_json <- jsonlite::toJSON(playoff_output, pretty = TRUE)
 playoff_table_file_path <- generate_file_path(
   current_year = current_year, 
   current_week = current_week,
