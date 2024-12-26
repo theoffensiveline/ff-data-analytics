@@ -71,3 +71,47 @@ yahoo_df <- read.csv("~/Fantasy Football/matchups.csv")
 yahoo_df %>%
   arrange(points)
 
+all_matchups %>%
+  group_by(week) %>%
+  arrange(desc(team_points)) %>%
+  mutate(rank = row_number()) %>%
+  filter(rank <= 3) %>%
+  ungroup() %>%
+  count(team_name, name = "top_3_finishes") %>%
+  arrange(desc(top_3_finishes))
+
+
+
+
+all_matchups %>%
+  # Step 1: Identify top 3 teams per week
+  group_by(week) %>%
+  arrange(desc(team_points)) %>%
+  mutate(rank = row_number()) %>%
+  filter(rank <= 3) %>%
+  select(week, matchup_id, team_name_top3 = team_name) %>%
+  ungroup() %>%
+  
+  # Step 2: Join back to find matchups involving top 3 teams
+  inner_join(all_matchups, by = c("week", "matchup_id")) %>%
+  
+  # Step 3: Count appearances of non-top-3 teams playing top-3 teams
+  filter(team_name != team_name_top3) %>%
+  count(team_name, name = "times_against_top_3") %>%
+  
+  # Step 4: Arrange results
+  arrange(desc(times_against_top_3))
+
+
+all_matchups %>%
+  filter(winner == 0, team_points > 100) %>%
+  count(team_name, name = "losses_over_100") %>%
+  arrange(desc(losses_over_100))
+
+
+all_matchups %>% 
+  group_by(week, matchup_id) %>%
+  summarise(
+    total_points = sum(team_points)
+  ) %>%
+  arrange(desc(total_points))
