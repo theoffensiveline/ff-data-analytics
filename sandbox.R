@@ -55,11 +55,14 @@ print(motw_tree)
 # Convert to JSON
 json_data <- toJSON(df_filtered, pretty = TRUE)
 
-write_json_to_file(json_data, generate_file_path(
-  current_year = current_year,
-  current_week = current_week,
-  file_name = "motwTree.json"
-))
+write_json_to_file(
+  json_data,
+  generate_file_path(
+    current_year = current_year,
+    current_week = current_week,
+    file_name = "motwTree.json"
+  )
+)
 
 
 
@@ -109,9 +112,39 @@ all_matchups %>%
   arrange(desc(losses_over_100))
 
 
-all_matchups %>% 
+all_matchups %>%
   group_by(week, matchup_id) %>%
-  summarise(
-    total_points = sum(team_points)
-  ) %>%
+  summarise(total_points = sum(team_points)) %>%
   arrange(desc(total_points))
+
+
+wk7_trans <- get_all_transaction_data(league_id, 7)
+
+wk7_trades <- wk7_trans %>%
+  filter(type == "trade")
+
+
+# position tables
+print(
+  starter_ppg %>%
+    filter(position == "K") %>%
+    filter(games_played >= 8) %>%
+    arrange(desc(ppg)),
+  n = 40
+)
+
+print(
+  starter_ppg %>%
+    filter(position == "K") %>%
+    filter(games_played < 8) %>%
+    arrange(desc(ppg)),
+  n = 25
+)
+
+print(
+  starter_ppg %>%
+    filter(position == "K") %>%
+    filter(games_played < 8) %>%
+    arrange(ppg),
+  n = 25
+)

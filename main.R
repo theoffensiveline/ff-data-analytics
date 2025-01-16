@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 1124831356770058240 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 16 #NFL_state$display_week
+current_week <- 17 #NFL_state$display_week
 current_year <- 24
 
 # team photos
@@ -390,7 +390,7 @@ for (week in 1:11) {
   # Define the non-player columns to exclude
   non_player_columns <- c("status", "type", "created", "leg", "draft_picks", "creator", 
                           "transaction_id", "consenter_ids", "roster_ids", "status_updated", 
-                          "waiver_budget", "is_counter", "expires_at")
+                          "waiver_budget", "is_counter", "expires_at", "waiver_bid", "priority")
   
   # Keep only columns that exist in the current data
   non_player_columns <- non_player_columns[non_player_columns %in% colnames(trades)]

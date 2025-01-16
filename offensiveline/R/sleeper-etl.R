@@ -87,8 +87,7 @@ get_week_matchup_data <- function(week_number, league_id) {
   cleaned_matchups <- matchups %>%
     arrange(matchup_id, points) %>%
     group_by(matchup_id) %>%
-    mutate(winner = case_when(points == max(points) ~ 1,
-                              TRUE ~ 0))
+    mutate(winner = case_when(points == max(points) ~ 1, TRUE ~ 0))
 
   # join team names to matchup data
   cleaned_matchups <-
@@ -117,10 +116,8 @@ get_all_starters_data <- function(max_week, league_id) {
       get_week_matchup_data(week, league_id) # Collect data for the current week
 
     week_data <- data.frame(
-      week = rep(week_data$week,
-                 sapply(week_data$starters, length)),
-      manager_id = rep(week_data$roster_id,
-                       sapply(week_data$starters, length)),
+      week = rep(week_data$week, sapply(week_data$starters, length)),
+      manager_id = rep(week_data$roster_id, sapply(week_data$starters, length)),
       starters = unlist(week_data$starters)
     )
 
@@ -168,26 +165,34 @@ get_all_matchups_data <- function(max_week, league_id, file_path) {
       get_week_matchup_data(week, league_id) # Collect data for the current week
 
     week_data_clean <- data.frame(
-      week = rep(week_data$week,
-                 sapply(week_data$players, length)),
-      matchup_id = rep(week_data$matchup_id,
-                       sapply(week_data$players, length)),
-      manager_id = rep(week_data$roster_id,
-                       sapply(week_data$players, length)),
-      team_name = rep(week_data$team_name,
-                      sapply(week_data$players, length)),
-      winner = rep(week_data$winner,
-                   sapply(week_data$players, length)),
-      team_points = rep(week_data$points,
-                        sapply(week_data$players, length)),
+      week = rep(week_data$week, sapply(week_data$players, length)),
+      matchup_id = rep(week_data$matchup_id, sapply(week_data$players, length)),
+      manager_id = rep(week_data$roster_id, sapply(week_data$players, length)),
+      team_name = rep(week_data$team_name, sapply(week_data$players, length)),
+      winner = rep(week_data$winner, sapply(week_data$players, length)),
+      team_points = rep(week_data$points, sapply(week_data$players, length)),
       players = unlist(week_data$players)
     )
 
     player_pts <-
-      pivot_longer(week_data,
-                   cols = c(-roster_id, -points, -players, -custom_points, -matchup_id, -starters, -starters_points, -winner, -owner_id, -team_name, -week),
-                   names_to = 'player_id',
-                   values_to = 'player_points') %>%
+      pivot_longer(
+        week_data,
+        cols = c(
+          -roster_id,
+          -points,
+          -players,
+          -custom_points,
+          -matchup_id,
+          -starters,
+          -starters_points,
+          -winner,
+          -owner_id,
+          -team_name,
+          -week
+        ),
+        names_to = 'player_id',
+        values_to = 'player_points'
+      ) %>%
       select(owner_id, player_id, points = player_points)
 
     player_pts <- player_pts %>%
@@ -264,17 +269,40 @@ get_team_photos <- function(league_id) {
   return(filtered_users)
 }
 
+get_transactions_sleeper <- function(league_id, round) {
+  # Check if class of round parameter is numeric
+  if (!is.numeric(round)) {
+    # If not numeric, inform user and halt function
+    stop("round parameter must be of type numeric")
+  }
+  # Query results from API given league ID and round specified
+  x <- jsonlite::fromJSON(httr::content(httr::GET(
+    paste0(
+      "https://api.sleeper.app/v1/league/",
+      league_id,
+      "/transactions/",
+      round
+    )
+  ), as = "text"))
+  # Check if returned object is a list
+  if (inherits(x, "list")) {
+    # If returned object is a list, inform user and return nothing
+    message("No data found. Were the league ID and round entered correctly?")
+  } else {
+    # If returned object is not a list, return object (which is a data frame)
+    return(x)
+  }
+}
 
-get_all_transaction_data <- function(max_week, league_id) {
-  all_data <- data.frame() # Initialize an empty data frame
+get_all_transaction_data <- function(league_id, max_week) {
+  all_data_list <- list()  # Initialize an empty list to store data
 
   for (week in 1:max_week) {
-    week_data <-
-      get_transactions(league_id, week) # Collect data for the current week
+    week_data <- get_transactions_sleeper(league_id, week)  # Collect data for the current week
 
-    result_df <- data.frame()
+    result_df <- data.frame()  # Temporary data frame for each week's transactions
 
-    # Iterate through each row of the transactions dataframe
+    # Iterate through each row of the transactions dataframe for player adds/drops and FAAB trades
     for (i in seq_len(nrow(week_data))) {
       # Extract information from the adds dataframe
       adds_df <- week_data$adds[i, ]
@@ -284,21 +312,25 @@ get_all_transaction_data <- function(max_week, league_id) {
           ncol(adds_df) > 0 && nrow(adds_df) > 0) {
         # Iterate through each column of the adds dataframe
         for (player_id in intersect(names(adds_df), colnames(adds_df))) {
-          # Ignore NA values
           if (!is.na(adds_df[[player_id]])) {
-            # Create a new row with player_id, manager_id, type, and status
+            # Ignore NA values
+            waiver_bid <- NA
+            if ("settings" %in% names(week_data) &&
+                "waiver_bid" %in% names(week_data$settings)) {
+              waiver_bid <- week_data$settings$waiver_bid[i]
+            }
+
             new_row <- data.frame(
               week = week,
               trans_id = week_data$transaction_id[i],
-              player_id = as.integer(player_id),
-              # Convert player_id to integer
+              player_id = player_id,
               manager_id = adds_df[[player_id]],
               type = week_data$type[i],
               status = week_data$status[i],
-              add_drop = 'add'
+              add_drop = 'add',
+              waiver_bid = waiver_bid
             )
 
-            # Append the new row to the result dataframe
             result_df <- rbind(result_df, new_row)
           }
         }
@@ -306,36 +338,73 @@ get_all_transaction_data <- function(max_week, league_id) {
 
       # Extract information from the drops dataframe
       drops_df <- week_data$drops[i, ]
-
-      # If drops_df is not NULL and not an empty dataframe, proceed with iteration
       if (!is.null(drops_df) &&
           ncol(drops_df) > 0 && nrow(drops_df) > 0) {
-        # Iterate through each column of the drops dataframe
         for (player_id in intersect(names(drops_df), colnames(drops_df))) {
-          # Ignore NA values
           if (!is.na(drops_df[[player_id]])) {
-            # Create a new row with player_id, manager_id, type, and status
             new_row <- data.frame(
               week = week,
               trans_id = week_data$transaction_id[i],
-              player_id = as.integer(player_id),
-              # Convert player_id to integer
+              player_id = player_id,
               manager_id = drops_df[[player_id]],
               type = week_data$type[i],
               status = week_data$status[i],
-              add_drop = 'drop'
+              add_drop = 'drop',
+              waiver_bid = NA
             )
 
-            # Append the new row to the result dataframe
             result_df <- rbind(result_df, new_row)
+          }
+        }
+      }
+
+      # Handle waiver budget transactions (FAAB trades)
+      if (length(week_data$waiver_budget) > 0 &&
+          !is.null(week_data$waiver_budget[[i]]) &&
+          length(week_data$waiver_budget[[i]]) > 0) {
+        waiver_data <- week_data$waiver_budget[[i]]
+
+        if (nrow(waiver_data) > 0) {
+          for (j in 1:nrow(waiver_data)) {
+            # Receiver gets FAAB
+            new_row <- data.frame(
+              week = week,
+              trans_id = week_data$transaction_id[i],
+              player_id = NA,
+              # No player involved in the FAAB trade
+              manager_id = waiver_data$receiver[j],
+              type = "trade",
+              status = week_data$status[i],
+              add_drop = "add",
+              waiver_bid = waiver_data$amount[j]
+            )
+
+            result_df <- rbind(result_df, new_row)
+
+            # Sender loses FAAB
+            new_row_sender <- data.frame(
+              week = week,
+              trans_id = week_data$transaction_id[i],
+              player_id = NA,
+              # No player involved in the FAAB trade
+              manager_id = waiver_data$sender[j],
+              type = "trade",
+              status = week_data$status[i],
+              add_drop = "drop",
+              waiver_bid = waiver_data$amount[j]
+            )
+
+            result_df <- rbind(result_df, new_row_sender)
           }
         }
       }
     }
 
-    all_data <- rbind(all_data, result_df) # Concatenate the data
+    all_data_list[[week]] <- result_df  # Store the week's data in the list
   }
+
+  # Combine all data at the end of the loop
+  all_data <- do.call(rbind, all_data_list)
 
   return(all_data)
 }
-
