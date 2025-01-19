@@ -596,31 +596,33 @@ all_trades <- all_transactions %>%
   group_by(trans_id) %>%
   mutate(
     winner = case_when(
-      max(total_points) > 0 &
-        total_points == max(total_points) ~ 1L,
+      max(total_points) > 0 & total_points == max(total_points) ~ 1L,
       # Team scored maximum points
       
       max(total_points) == 0 &
-        n_distinct(waiver_bid[!is.na(waiver_bid)]) == 1 &
-        !is.na(waiver_bid) ~ 1L,
-      # No points but only one team bid
+        sum(!is.na(waiver_bid)) == 1 & !is.na(waiver_bid) ~ 1L,
+      # No points, but only one team placed a bid, that team wins
       
       max(total_points) == 0 &
-        n_distinct(waiver_bid[!is.na(waiver_bid)]) == 1 &
-        is.na(waiver_bid) ~ 0L,
-      # No points, one team bid but this team didn't
+        sum(!is.na(waiver_bid)) == 1 & is.na(waiver_bid) ~ 0L,
+      # No points, only one team bid, the other is a loser
       
       max(total_points) == 0 &
-        length(waiver_bid[!is.na(waiver_bid)]) > 1 &
+        length(unique(waiver_bid[!is.na(waiver_bid)])) == 2 ~ case_when(
+          # Case where there are exactly two distinct bids
+          waiver_bid == max(waiver_bid, na.rm = TRUE) ~ 1L, # Higher bid wins
+          waiver_bid == min(waiver_bid, na.rm = TRUE) ~ 0L  # Lower bid loses
+        ),
+      
+      max(total_points) == 0 &
+        length(unique(waiver_bid[!is.na(waiver_bid)])) == 1 ~ NA_integer_,
+      # No points, but all bids are the same, mark both as NA
+      
+      max(total_points) == 0 &
         sum(waiver_bid == max(waiver_bid, na.rm = TRUE), na.rm = TRUE) > 1 ~ NA_integer_,
-      # No points and tied bids (multiple rows with the max bid)
+      # No points, and tied bids (multiple rows with the max bid), mark both as NA
       
-      max(total_points) == 0 &
-        waiver_bid == max(waiver_bid, na.rm = TRUE) &
-        sum(waiver_bid == max(waiver_bid, na.rm = TRUE), na.rm = TRUE) == 1 ~ 1L,
-      # No points but unique highest bid (only one row with the max bid)
-      
-      TRUE ~ 0L  # All other cases
+      TRUE ~ 0L  # For all other cases, mark as 0
     )
   ) %>%
   ungroup() %>%
