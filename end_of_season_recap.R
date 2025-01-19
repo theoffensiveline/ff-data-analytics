@@ -476,7 +476,7 @@ best_ball_bench_json <- jsonlite::toJSON(best_ball_bench)
 
 clipr::write_clip(best_ball_bench_json)
 
-test <- best_ball_bench %>%
+recap_data <- best_ball_bench %>%
   group_by(manager_id) %>%
   summarise(
     wrong_start_sits = n(),
