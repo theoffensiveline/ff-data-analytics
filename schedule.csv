@@ -1,0 +1,85 @@
+Week,Type,Home,Away
+1,Regular,Josh K,Nikhil
+1,Regular,Greg,Jake
+1,Regular,Devan,Josh L
+1,Regular,Smitty,Alec
+1,Regular,Trevor,Matt Rob
+1,Regular,Kyle,Anthony
+2,Regular,Josh K,Trevor
+2,Regular,Kyle,Smitty
+2,Regular,Anthony,Devan
+2,Regular,Matt Rob,Greg
+2,Regular,Alec,Nikhil
+2,Regular,Josh L,Jake
+3,Regular,Josh K,Devan
+3,Regular,Smitty,Greg
+3,Regular,Trevor,Nikhil
+3,Regular,Kyle,Jake
+3,Regular,Anthony,Josh L
+3,Regular,Matt Rob,Alec
+4,Regular,Josh K,Smitty
+4,Regular,Trevor,Devan
+4,Regular,Kyle,Greg
+4,Regular,Anthony,Nikhil
+4,Regular,Matt Rob,Jake
+4,Regular,Alec,Josh L
+5,Regular,Josh K,Anthony
+5,Regular,Matt Rob,Kyle
+5,Regular,Alec,Trevor
+5,Regular,Josh L,Smitty
+5,Regular,Jake,Devan
+5,Regular,Nikhil,Greg
+6,Regular,Josh K,Josh L
+6,Regular,Jake,Alec
+6,Regular,Nikhil,Matt Rob
+6,Regular,Greg,Anthony
+6,Regular,Devan,Kyle
+6,Regular,Smitty,Trevor
+7,Regular,Josh K,Matt Rob
+7,Regular,Alec,Anthony
+7,Regular,Josh L,Kyle
+7,Regular,Jake,Trevor
+7,Regular,Nikhil,Smitty
+7,Regular,Greg,Devan
+8,Regular,Josh K,Alec
+8,Regular,Josh L,Matt Rob
+8,Regular,Jake,Anthony
+8,Regular,Nikhil,Kyle
+8,Regular,Greg,Trevor
+8,Regular,Devan,Smitty
+9,Regular,Josh K,Kyle
+9,Regular,Anthony,Trevor
+9,Regular,Matt Rob,Smitty
+9,Regular,Alec,Devan
+9,Regular,Josh L,Greg
+9,Regular,Jake,Nikhil
+10,Regular,Josh K,Jake
+10,Regular,Nikhil,Josh L
+10,Regular,Greg,Alec
+10,Regular,Devan,Matt Rob
+10,Regular,Smitty,Anthony
+10,Regular,Trevor,Kyle
+11,Regular,Josh K,Greg
+11,Regular,Devan,Nikhil
+11,Regular,Smitty,Jake
+11,Regular,Trevor,Josh L
+11,Regular,Kyle,Alec
+11,Regular,Anthony,Matt Rob
+12,Division,Devan,Nikhil
+12,Division,Kyle,Josh K
+12,Division,Smitty,Jake
+12,Division,Matt Rob,Josh L
+12,Division,Trevor,Anthony
+12,Division,Greg,Alec
+13,Division,Nikhil,Greg
+13,Division,Matt Rob,Smitty
+13,Division,Kyle,Trevor
+13,Division,Devan,Alec
+13,Division,Jake,Josh L
+13,Division,Josh K,Anthony
+14,Division,Kyle,Anthony
+14,Division,Smitty,Josh L
+14,Division,Trevor,Josh K
+14,Division,Devan,Greg
+14,Division,Nikhil,Alec
+14,Division,Matt Rob,Jake
