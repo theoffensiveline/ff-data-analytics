@@ -409,11 +409,11 @@ schedule_comparison_to_json <- function(matchup_data, team_photos) {
   return(json_data)
 }
 
-generate_file_path <- function(base_path = "C:/Users/Trevor/Documents/Fantasy Football/theoffensiveline-site/src/newsletters/20",
+generate_file_path <- function(base_path = "../theoffensiveline-site/src/newsletters/20",
                                current_year,
                                current_week,
                                file_name) {
-  paste0(base_path, current_year, " Week ", current_week, "/", file_name)
+  paste0(base_path, current_year, "/20", current_year, " Week ", current_week, "/", file_name)
 }
 
 # Define a function to write JSON data to a file

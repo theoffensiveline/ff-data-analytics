@@ -18,12 +18,12 @@ library(reticulate)
 library(rcartocolor)
 
 # Define the league ID, sleeper players file, and get NFL state
-# league_id <- 968890022248103936 # Walter league
-league_id <- 1124831356770058240 # main league
+# league_id <- 1223730601350135814 # Walter league
+league_id <- 1253779168802377728 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 17 #NFL_state$display_week
-current_year <- 24
+current_week <- 1 #NFL_state$display_week
+current_year <- 25
 
 # team photos
 team_photos <- get_team_photos(league_id)
@@ -45,7 +45,7 @@ all_matchups <- all_matchups[complete.cases(all_matchups$matchup_id), ]
 # get MotW data
 motw_data <- add_motw_to_matchups(
   matchup_data = all_matchups,
-  week_1_matchup_id = 2,
+  week_1_matchup_id = 1,
   max_week = current_week,
   player_data = all_players
 )
@@ -230,7 +230,7 @@ full_season_schedule <- get_team_matchups(full_season_player_data)
 full_season_motw_schedule <-
   add_motw_to_matchups(
     full_season_schedule,
-    week_1_matchup_id = 2,
+    week_1_matchup_id = 1,
     max_week = 2,
     full_season_player_data
   )
@@ -248,7 +248,7 @@ motw_schedule_output <-
 motw_schedule_output
 
 write_csv(motw_schedule_output,
-          "currentMotW/schedule24.csv",
+          "currentMotW/schedule25.csv",
           col_names = FALSE)
 
 # run python script for MotW data - don't forget to edit first
@@ -335,7 +335,7 @@ write_json_to_file(danger_table_json, danger_table_file_path)
 # 
 # 
 # 
-transactions <- get_transactions(league_id, 7)
+transactions <- get_transactions(league_id, 1)
 
 transactions[transactions$type == 'trade', c('type', 'status')]
 

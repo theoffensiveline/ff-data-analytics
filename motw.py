@@ -5,9 +5,9 @@ import uuid
 import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 
-CURRENT_YEAR = 24
-CURRENT_WEEK = 14
-CURRENT_CHAMPION = "Njorkin da Tenis"
+CURRENT_YEAR = 25
+CURRENT_WEEK = 2
+CURRENT_CHAMPION = "D.K’s Minions Return?"
 matchups = [['Week', 'Champion', 'Opponent']]
 
 
@@ -44,7 +44,7 @@ def build(name, week, last_week, schedule, dot, my_uuid):
 
 def make_schedule_map():
     schedule = dict()
-    with open('currentMotW/schedule24.csv', newline='') as csvfile:
+    with open('currentMotW/schedule25.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             week = int(row[0])
@@ -81,7 +81,9 @@ def main():
                       CURRENT_WEEK + 2, schedule, dot, str(uuid.uuid1()))
 
     # Use raw string for the file path to avoid issues with backslashes
-    path = r"C:\\Users\\Trevor\\Documents\\Fantasy Football\\theoffensiveline-site\\src\\newsletters\\20" + str(CURRENT_YEAR) + " Week " + str(CURRENT_WEEK-1) + r"\\motwFuture"
+    path = os.path.join("..", "theoffensiveline-site", "src", "newsletters", 
+                    f"20{CURRENT_YEAR}", f"20{CURRENT_YEAR} Week {CURRENT_WEEK-1}", "motwFuture")
+    print(path)
     dot.render(path, format='png', cleanup=True)
     
     del matchups[1:]
