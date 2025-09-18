@@ -65,18 +65,18 @@ playoff_chances$`Play-off %` <- c(100,
                                   0,
                                   0,
                                   0)
-playoff_chances$`WP Playoff %` <- c(55,
-                             62,
-                             39,
-                             57,
-                             65,
-                             68,
-                             60,
-                             46,
-                             47,
-                             32,
-                             60,
-                             9)
+playoff_chances$`WP Playoff %` <- c(90,
+                             56,
+                             82,
+                             41,
+                             80,
+                             43,
+                             54,
+                             66,
+                             24,
+                             51,
+                             10,
+                             3)
 playoff_chances$`Last %` <- c(0,0,0,0,0,0,0,0,0,0,0,100)
 
 playoff_output <- merge(playoff_output, playoff_chances)
