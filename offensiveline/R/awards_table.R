@@ -188,7 +188,7 @@ create_awards_table <-
     bench_points <- matchup_data %>%
       left_join(best_ball_matchups,
                 by = c('week', 'manager_id', 'team_name', 'matchup_id')) %>%
-      mutate(points_on_bench = team_points.y - team_points.x) %>%
+      mutate(points_on_bench = round(team_points.y - team_points.x, 1)) %>%
       select(-team_points.x,-team_points.y,-winner.x,-winner.y) %>%
       mutate(
         most_bench_pts_rank = rank(-points_on_bench, ties.method = "min"),
