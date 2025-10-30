@@ -1,6 +1,15 @@
 library(sleeperapi)
 
-league_id <- 1124831356770058240 # main league
+old_league_id <- 1124831356770058240 # main league
+
+# get all player data for each matchup
+old_all_players <- get_all_matchups_data(17,
+                                     old_league_id,
+                                     sleeper_players_csv)
+
+
+# summarize to the team level
+old_all_matchups <- get_team_matchups(player_data = old_all_players)
 
 users <- get_league_users(league_id)
 filtered_users <- users %>% select(team_name, avatar)

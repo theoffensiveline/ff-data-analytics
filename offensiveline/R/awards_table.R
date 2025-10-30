@@ -211,14 +211,22 @@ create_awards_table <-
       filter(week == current_week) %>%
       slice_max(order_by = -points_on_bench)
 
-    awards <- rbind(
-      awards,
-      c(award = "Heaviest Top",
-        photo = team_photos[team_photos$team_name == least_bench_points$team_name, "image_or_text"],
-        name = least_bench_points$team_name,
-        value = sprintf('Left %s points on the bench', least_bench_points$points_on_bench),
-        description = sprintf('This is the #%s optimized lineup this season', least_bench_points$least_bench_pts_rank)))
+    # Handle ties for Heaviest Top award
+    for (i in seq_len(nrow(least_bench_points))) {
+      award_name <- if (nrow(least_bench_points) > 1) {
+        paste("Heaviest Top", i)
+      } else {
+        "Heaviest Top"
+      }
 
+      awards <- rbind(
+        awards,
+        c(award = award_name,
+          photo = team_photos[team_photos$team_name == least_bench_points$team_name[i], "image_or_text"],
+          name = least_bench_points$team_name[i],
+          value = sprintf('Left %s points on the bench', least_bench_points$points_on_bench[i]),
+          description = sprintf('This is the #%s optimized lineup this season', least_bench_points$least_bench_pts_rank[i])))
+    }
     ###### MVP and Bench MVP Award ######
     # get MVP data and award entry
     mvp_data <- player_data %>%

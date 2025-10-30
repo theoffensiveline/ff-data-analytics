@@ -4,80 +4,65 @@ library(dplyr)
 library(tidyr)
 library(offensiveline)
 
-##### leaderboard ######
+##### Leaderboard ######
 leaderboard_data <- create_leaderboard(all_matchups, current_week)
 
-##### need to clean up #####
-
 ###### Create Playoff Board ######
-playoff_output <- leaderboard_data[, c(1, 3, 4, 5)]
-playoff_output$last_losses <- max(playoff_output$L)
-playoff_output$max_losses_top6 <- playoff_output[7, 4]
-playoff_output$max_losses_bottom6 <- playoff_output[6, 4]
+# Start with relevant columns
+playoff_output <- leaderboard_data[, c("Rank", "Team", "W", "L")]
 
-# Helper Columns for Play-off #
-playoff_output$`Play-off #` <- NA  # Initialize with NA
+# Extract key values
+last_losses <- max(playoff_output$L)
+max_losses_top6 <- playoff_output$L[7]
+max_losses_bottom6 <- playoff_output$L[6]
 
-# Calculate Play-off # for top 6
-playoff_output$`Play-off #`[1:6] <- (14 + 1 - playoff_output$W - playoff_output$max_losses_top6)[1:6,]
+# Calculate Play-off # (magic number for clinching playoff spot)
+playoff_output$`Play-off #` <- c(
+  # Top 6: games needed to clinch vs 7th place
+  15 - playoff_output$W[1:6] - max_losses_top6,
+  # Bottom 6: games needed to catch 6th place
+  15 - playoff_output$W[7:12] - max_losses_bottom6
+)
 
-# Calculate Play-off # for bottom 6
-playoff_output$`Play-off #`[7:12] <- (14 + 1 - playoff_output$W - playoff_output$max_losses_bottom6)[7:12,]
+# Calculate Last # (magic number for avoiding last place)
+playoff_output$`Last #` <- (14 - current_week) - (last_losses - playoff_output$L - 1)
 
-# Helper Column for Last #
-playoff_output$`Last #` <- (14 - current_week) - (playoff_output$last_losses - playoff_output$L - 1)
+# Adjust last place team's Last # based on gap to 11th place
+playoff_output$`Last #`[12] <- playoff_output$`Last #`[12] + 
+  (playoff_output$L[12] - playoff_output$L[11])
 
-# Finalizing Data Frame
-playoff_output <- playoff_output[, c(1, 2, 3, 4, 8, 9)]
-
-# Adjusting specific cells
-playoff_output[12, 6] <- playoff_output[12, 6] + (playoff_output[12, 4] - playoff_output[11, 4])
-
-# Using mutate for clearer assignments
+# Add status indicators
 playoff_output <- playoff_output %>%
   mutate(
-    playoff_eliminated = ifelse(playoff_output[, 5] > 2 * (14 - current_week) + 1, 'ELIMINATED', NA),
-    playoff_clinched = ifelse(playoff_output[, 5] <= 0, 'CLINCHED', NA),
-    last_safe = ifelse(playoff_output[, 6] <= 0, 'SAFE', NA)
+    `Play-off #` = case_when(
+      `Play-off #` <= 0 ~ "CLINCHED",
+      `Play-off #` > 2 * (14 - current_week) + 1 ~ "ELIMINATED",
+      TRUE ~ as.character(`Play-off #`)
+    ),
+    `Last #` = case_when(
+      `Last #` <= 0 ~ "SAFE",
+      TRUE ~ as.character(`Last #`)
+    )
   )
-
-# Coalesce final results into the desired columns
-playoff_output$`Play-off #` <- coalesce(playoff_output$playoff_eliminated, playoff_output$playoff_clinched, as.character( playoff_output$`Play-off #`))
-playoff_output$`Last #` <- coalesce(playoff_output$last_safe, as.character(playoff_output$`Last #`))
-
-# Optionally drop helper columns if no longer needed
-playoff_output <- playoff_output %>%
-  select(-playoff_eliminated, -playoff_clinched, -last_safe)
 
 
 ###### Manual edit for playoff chances ######
-playoff_chances <- leaderboard_data[, 3]
+playoff_chances <- leaderboard_data[,c('Team')]
 playoff_chances
-playoff_chances$`Play-off %` <- c(100,
-                                  100,
-                                  100,
-                                  100,
-                                  100,
-                                  99.99,
-                                  0.01,
-                                  0,
-                                  0,
-                                  0,
-                                  0,
-                                  0)
-playoff_chances$`WP Playoff %` <- c(95,
-                             94,
-                             68,
-                             69,
-                             48,
-                             56,
-                             10,
-                             22,
-                             31,
-                             80,
-                             1,
-                             26)
-playoff_chances$`Last %` <- c(0,0,0,0,0,0,0,0,0,0,0,100)
+playoff_chances$`Play-off %` <- c(99.99,
+                                  98.63,
+                                  95.76,
+                                  89.15,
+                                  78.59,
+                                  38.85,
+                                  49.97,
+                                  26.33,
+                                  6.13,
+                                  5.83,
+                                  10.73,
+                                  0.04)
+playoff_chances$`WP Playoff %` <- c(98, 97, 96, 96, 59, 51, 34, 19, 20, 11, 17, 0.5)
+playoff_chances$`Last %` <- c(0, 0, 0, 0, 0.02, 0.23, 0.21, 0.72, 4.68, 4.65, 6.06, 83.43)
 
 playoff_output <- merge(playoff_output, playoff_chances)
 
@@ -104,30 +89,25 @@ playoff_output$WPPlayoffColor <- spec_color2_scale(
   direction = 1
 )
 
-playoff_output$LastColor <- spec_color2_scale(
-  playoff_output$`Last %`,
-  scale_from = c(
-    min(playoff_output$`Last %`),
-    max(playoff_output$`Last %`)
-  ),
-  direction = -1
-)
+playoff_output$LastColor <- spec_color2_scale(playoff_output$`Last %`,
+                                              scale_from = c(min(playoff_output$`Last %`), max(playoff_output$`Last %`)),
+                                              direction = -1)
 
 playoff_output$PlayoffMagicColor <- ifelse(
   playoff_output$`Play-off #` == "CLINCHED",
   '#227740',
-  ifelse(playoff_output$`Play-off #` == "ELIMINATED", '#bc293d', NA))
+  ifelse(playoff_output$`Play-off #` == "ELIMINATED", '#bc293d', NA)
+)
 
-playoff_output$LastMagicColor <- ifelse(
-  playoff_output$`Last #` == "SAFE",
-  '#227740',
-  ifelse(is.na(playoff_output$`Last #`), '#bc293d', NA))
+playoff_output$LastMagicColor <- ifelse(playoff_output$`Last #` == "SAFE",
+                                        '#227740',
+                                        ifelse(is.na(playoff_output$`Last #`), '#bc293d', NA))
 
 write_clip(toJSON(playoff_output, pretty = TRUE))
 
 # ###### median and best ball ######
 # median_lb_data <- create_median_leaderboard(all_matchups, current_week)
-# 
+#
 # median_lb_data$PFColor <- spec_color2_scale(
 #   median_lb_data$PF,
 #   scale_from = c(
@@ -136,7 +116,7 @@ write_clip(toJSON(playoff_output, pretty = TRUE))
 #   ),
 #   direction = 1
 # )
-# 
+#
 # median_lb_data$PAColor <- spec_color2_scale(
 #   median_lb_data$PA,
 #   scale_from = c(
@@ -145,23 +125,23 @@ write_clip(toJSON(playoff_output, pretty = TRUE))
 #   ),
 #   direction = -1
 # )
-# 
+#
 # write_clip(toJSON(median_lb_data, pretty = TRUE))
-# 
-# 
+#
+#
 # # create best ball data and outputs
 # best_ball_lineups <-
 #   calc_best_ball_lineups(player_data = all_players,
 #                          max_week = current_week)
-# 
+#
 # best_ball_matchups <-
 #   create_best_ball_matchups(optimal_lineups = best_ball_lineups)
-# 
+#
 # best_ball_leaderboard <-
 #   create_best_ball_leaderboard(matchup_data = all_matchups,
 #                                best_ball_matchup_data = best_ball_matchups,
 #                                max_week = current_week)
-# 
+#
 # best_ball_leaderboard$PFColor <- spec_color2_scale(
 #   best_ball_leaderboard$PF,
 #   scale_from = c(
@@ -170,7 +150,7 @@ write_clip(toJSON(playoff_output, pretty = TRUE))
 #   ),
 #   direction = 1
 # )
-# 
+#
 # best_ball_leaderboard$PAColor <- spec_color2_scale(
 #   best_ball_leaderboard$PA,
 #   scale_from = c(
@@ -179,13 +159,13 @@ write_clip(toJSON(playoff_output, pretty = TRUE))
 #   ),
 #   direction = -1
 # )
-# 
+#
 # write_clip(toJSON(best_ball_leaderboard, pretty = TRUE))
-# 
-# 
-# 
+#
+#
+#
 # ###### schedule comparison ######
-# 
+#
 # your_data <- matchup_data %>%
 #   select(week, team_name, image_or_text, matchup_id, team_points) %>%
 #   group_by(week, matchup_id) %>%
@@ -195,36 +175,36 @@ write_clip(toJSON(playoff_output, pretty = TRUE))
 #     team_name != unique(team_name)[1] ~ lag(team_points, order_by = team_name)
 #   )) %>%
 #   ungroup()
-# 
+#
 # team_list <- unique(your_data$team_name)
-# 
+#
 # records_list <- list()
-# 
+#
 # # Initialize team_records data frame
 # team_records <- data.frame(team1 = character(), team2 = character(), wins = numeric(), losses = numeric(), ties = numeric(), stringsAsFactors = FALSE)
-# 
+#
 # for (team in team_list) {
 #   # get team scores for each week
-#   team_scores <- your_data %>% 
-#     filter(team_name == team) %>% 
+#   team_scores <- your_data %>%
+#     filter(team_name == team) %>%
 #     select(week, team_points, matchup_id)
-#   
+#
 #   for (team2 in team_list) {
 #     # Initialize wins, losses, ties inside the inner loop
 #     wins <- 0
 #     losses <- 0
 #     ties <- 0
-#     
+#
 #     opponent_scores <- your_data %>%
 #       filter(team_name == team2) %>%
 #       select(week, team_points, other_team_points, matchup_id)
-#     
+#
 #     merged_scores <- merge(team_scores, opponent_scores, by = "week")
-#     
+#
 #     print(merged_scores)
-#     
+#
 #     for (i in 1:nrow(merged_scores)) {
-#       if ((merged_scores$matchup_id.x[i] == merged_scores$matchup_id.y[i]) & 
+#       if ((merged_scores$matchup_id.x[i] == merged_scores$matchup_id.y[i]) &
 #           (team != team2)
 #           ) {
 #         if (merged_scores$team_points.x[i] > merged_scores$team_points.y[i]) {
@@ -249,21 +229,21 @@ write_clip(toJSON(playoff_output, pretty = TRUE))
 #     records_list <- c(records_list, list(record))
 #   }
 # }
-# 
+#
 # # Convert the list of records to a data frame using bind_rows
 # team_records <- bind_rows(records_list)
-# 
+#
 # # Display the resulting data frame
 # team_records
-# 
-# best_records <- team_records %>% 
+#
+# best_records <- team_records %>%
 #   group_by(team1) %>%
 #   filter(wins == max(wins)) %>%
 #   summarize(team2_list = list(team2),
 #             wins = max(wins),
 #             losses = max(losses),
 #             ties = max(ties))
-# 
+#
 # worst_records <- team_records %>%
 #   group_by(team1) %>%
 #   filter(wins == min(wins)) %>%
@@ -271,16 +251,16 @@ write_clip(toJSON(playoff_output, pretty = TRUE))
 #             wins = max(wins),
 #             losses = max(losses),
 #             ties = max(ties))
-# 
+#
 # current_records <- team_records %>%
 #   filter(team1 == team2) %>%
 #   select(team1, wins, losses, ties)
-# 
+#
 # # Combine records into a list
 # combined_list <- list(
 #   best_records = best_records,
 #   worst_records = worst_records,
 #   current_records = current_records
 # )
-# 
+#
 # write_clip(toJSON(combined_list, pretty = TRUE))
