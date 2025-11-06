@@ -1,6 +1,18 @@
 library(sleeperapi)
+library(offensiveline)
+sleeper_players_csv <- "sleeper_players.csv"
 
-old_league_id <- 1124831356770058240 # main league
+
+
+league_id <- 1253779168802377728 # main league
+
+league <- get_league(league_id)
+
+old_league_id <- as.numeric(league$previous_league_id) # main league 2024
+
+old_league <- get_league(old_league_id)
+
+older_league_id <- as.numeric(old_league$previous_league_id)
 
 # get all player data for each matchup
 old_all_players <- get_all_matchups_data(17,
@@ -10,6 +22,8 @@ old_all_players <- get_all_matchups_data(17,
 
 # summarize to the team level
 old_all_matchups <- get_team_matchups(player_data = old_all_players)
+
+
 
 users <- get_league_users(league_id)
 filtered_users <- users %>% select(team_name, avatar)
@@ -82,6 +96,51 @@ library(dplyr)
 yahoo_df <- read.csv("~/Fantasy Football/matchups.csv")
 yahoo_df %>%
   arrange(points)
+
+
+# Define the target manager and the specific group
+target_manager <- "Who\x92s Trevor??"
+specific_group <- c("Caught on Kamara", "Gay Bills", "Tucker Right in the Kelce")
+
+# Filter for Trevor's games
+trevor_games <- yahoo_df[yahoo_df$manager == target_manager, ]
+
+# 1. Overall win/loss record
+overall_wins <- sum(trevor_games$win == "True")
+overall_losses <- sum(trevor_games$win == "False")
+
+cat("Trevor's Overall Record:\n")
+cat(sprintf("Wins: %d, Losses: %d\n\n", overall_wins, overall_losses))
+
+# 2. Win/loss record against specific group
+trevor_vs_group <- trevor_games[trevor_games$opponent %in% specific_group, ]
+group_wins <- sum(trevor_vs_group$win == "True")
+group_losses <- sum(trevor_vs_group$win == "False")
+
+cat("Trevor's Record vs Caught on Kamara, Gay Bills, and Tucker Right in the Kelce:\n")
+cat(sprintf("Wins: %d, Losses: %d\n\n", group_wins, group_losses))
+
+# 3. Win/loss record against everyone else
+trevor_vs_others <- trevor_games[!(trevor_games$opponent %in% specific_group), ]
+others_wins <- sum(trevor_vs_others$win == "True")
+others_losses <- sum(trevor_vs_others$win == "False")
+
+cat("Trevor's Record vs Everyone Else:\n")
+cat(sprintf("Wins: %d, Losses: %d\n", others_wins, others_losses))
+
+# Optional: Create a summary data frame
+summary_df <- data.frame(
+  Category = c("Overall", "vs Specific Group", "vs Others"),
+  Wins = c(overall_wins, group_wins, others_wins),
+  Losses = c(overall_losses, group_losses, others_losses)
+)
+
+print(summary_df)
+
+
+
+
+
 
 all_matchups %>%
   group_by(week) %>%
@@ -157,3 +216,137 @@ print(
     arrange(ppg),
   n = 25
 )
+
+
+
+
+
+get_all_historical_matchups <- function(league_id, sleeper_players_csv, max_weeks = 17) {
+  
+  # Initialize list to store all matchups
+  all_historical_matchups <- list()
+  
+  # Start with the current league
+  current_league_id <- league_id
+  season_counter <- 1
+  
+  # Loop through all previous seasons
+  while (!is.null(current_league_id)) {
+    
+    cat(sprintf("Processing league ID: %s\n", current_league_id))
+    
+    # Get league info
+    tryCatch({
+      league <- get_league(current_league_id)
+      season_year <- league$season
+      
+      cat(sprintf("Season: %s\n", season_year))
+      
+      # Get all player data for each matchup
+      all_players <- get_all_matchups_data(max_weeks,
+                                           current_league_id,
+                                           sleeper_players_csv)
+      
+      # Summarize to the team level
+      matchups <- get_team_matchups(player_data = all_players)
+      
+      # Add season identifier from league
+      matchups$season <- season_year
+      matchups$league_id <- current_league_id
+      
+      # Store in list
+      all_historical_matchups[[season_counter]] <- matchups
+      
+      # Move to previous season (will be NULL when no more previous leagues)
+      current_league_id <- league$previous_league_id
+      if (!is.null(current_league_id)) {
+        current_league_id <- as.numeric(current_league_id)
+      }
+      season_counter <- season_counter + 1
+      
+    }, error = function(e) {
+      cat(sprintf("Error processing league %s: %s\n", current_league_id, e$message))
+      current_league_id <<- NULL  # Stop the loop on error
+    })
+  }
+  
+  # Combine all seasons into one dataframe
+  if (length(all_historical_matchups) > 0) {
+    combined_matchups <- do.call(rbind, all_historical_matchups)
+    rownames(combined_matchups) <- NULL
+    
+    cat(sprintf("\nSuccessfully processed %d seasons\n", length(all_historical_matchups)))
+    cat(sprintf("Total matchups: %d\n", nrow(combined_matchups)))
+    
+    return(combined_matchups)
+  } else {
+    cat("No matchups found\n")
+    return(NULL)
+  }
+}
+
+# Usage:
+all_historical_matchups <- get_all_historical_matchups(league_id = league_id, 
+                                                       sleeper_players_csv = sleeper_players_csv,
+                                                       max_weeks = 17)
+
+
+# Define the target manager and the specific group
+target_manager_id <- 11
+specific_group_ids <- c(2, 8, 4)
+
+# Filter for Trevor's games (manager_id 11)
+trevor_games <- all_historical_matchups[all_historical_matchups$manager_id == target_manager_id, ]
+
+# Get Trevor's opponent IDs for each matchup
+# First, create a helper to find opponents
+get_opponent_id <- function(week, matchup_id, manager_id, df) {
+  # Find the other team in the same week and matchup
+  opponent <- df[df$week == week & 
+                   df$matchup_id == matchup_id & 
+                   df$manager_id != manager_id, ]
+  if (nrow(opponent) > 0) {
+    return(opponent$manager_id[1])
+  } else {
+    return(NA)
+  }
+}
+
+# Add opponent_id column to trevor_games
+trevor_games$opponent_id <- mapply(get_opponent_id, 
+                                   trevor_games$week, 
+                                   trevor_games$matchup_id, 
+                                   trevor_games$manager_id,
+                                   MoreArgs = list(df = all_historical_matchups))
+
+# 1. Overall win/loss record
+overall_wins <- sum(trevor_games$winner == 1)
+overall_losses <- sum(trevor_games$winner == 0)
+
+cat("Trevor's Overall Record:\n")
+cat(sprintf("Wins: %d, Losses: %d\n\n", overall_wins, overall_losses))
+
+# 2. Win/loss record against specific group (IDs 2, 8, 4)
+trevor_vs_group <- trevor_games[trevor_games$opponent_id %in% specific_group_ids, ]
+group_wins <- sum(trevor_vs_group$winner == 1, na.rm = TRUE)
+group_losses <- sum(trevor_vs_group$winner == 0, na.rm = TRUE)
+
+cat("Trevor's Record vs Manager IDs 2, 8, and 4:\n")
+cat(sprintf("Wins: %d, Losses: %d\n\n", group_wins, group_losses))
+
+# 3. Win/loss record against everyone else
+trevor_vs_others <- trevor_games[!(trevor_games$opponent_id %in% specific_group_ids), ]
+others_wins <- sum(trevor_vs_others$winner == 1, na.rm = TRUE)
+others_losses <- sum(trevor_vs_others$winner == 0, na.rm = TRUE)
+
+cat("Trevor's Record vs Everyone Else:\n")
+cat(sprintf("Wins: %d, Losses: %d\n", others_wins, others_losses))
+
+# Optional: Create a summary data frame
+summary_df <- data.frame(
+  Category = c("Overall", "vs Specific Group", "vs Others"),
+  Wins = c(overall_wins, group_wins, others_wins),
+  Losses = c(overall_losses, group_losses, others_losses)
+)
+
+print(summary_df)
