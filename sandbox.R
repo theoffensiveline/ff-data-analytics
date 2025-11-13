@@ -15,9 +15,7 @@ old_league <- get_league(old_league_id)
 older_league_id <- as.numeric(old_league$previous_league_id)
 
 # get all player data for each matchup
-old_all_players <- get_all_matchups_data(17,
-                                     old_league_id,
-                                     sleeper_players_csv)
+old_all_players <- get_all_matchups_data(17, old_league_id, sleeper_players_csv)
 
 
 # summarize to the team level
@@ -209,20 +207,19 @@ print(
   n = 25
 )
 
-print(
-  starter_ppg %>%
-    filter(position == "K") %>%
-    filter(games_played < 8) %>%
-    arrange(ppg),
-  n = 25
-)
+print(starter_ppg %>%
+        filter(position == "K") %>%
+        filter(games_played < 8) %>%
+        arrange(ppg),
+      n = 25)
 
 
 
 
 
-get_all_historical_matchups <- function(league_id, sleeper_players_csv, max_weeks = 17) {
-  
+get_all_historical_matchups <- function(league_id,
+                                        sleeper_players_csv,
+                                        max_weeks = 17) {
   # Initialize list to store all matchups
   all_historical_matchups <- list()
   
@@ -232,7 +229,6 @@ get_all_historical_matchups <- function(league_id, sleeper_players_csv, max_week
   
   # Loop through all previous seasons
   while (!is.null(current_league_id)) {
-    
     cat(sprintf("Processing league ID: %s\n", current_league_id))
     
     # Get league info
@@ -243,9 +239,7 @@ get_all_historical_matchups <- function(league_id, sleeper_players_csv, max_week
       cat(sprintf("Season: %s\n", season_year))
       
       # Get all player data for each matchup
-      all_players <- get_all_matchups_data(max_weeks,
-                                           current_league_id,
-                                           sleeper_players_csv)
+      all_players <- get_all_matchups_data(max_weeks, current_league_id, sleeper_players_csv)
       
       # Summarize to the team level
       matchups <- get_team_matchups(player_data = all_players)
@@ -265,7 +259,11 @@ get_all_historical_matchups <- function(league_id, sleeper_players_csv, max_week
       season_counter <- season_counter + 1
       
     }, error = function(e) {
-      cat(sprintf("Error processing league %s: %s\n", current_league_id, e$message))
+      cat(sprintf(
+        "Error processing league %s: %s\n",
+        current_league_id,
+        e$message
+      ))
       current_league_id <<- NULL  # Stop the loop on error
     })
   }
@@ -275,7 +273,10 @@ get_all_historical_matchups <- function(league_id, sleeper_players_csv, max_week
     combined_matchups <- do.call(rbind, all_historical_matchups)
     rownames(combined_matchups) <- NULL
     
-    cat(sprintf("\nSuccessfully processed %d seasons\n", length(all_historical_matchups)))
+    cat(sprintf(
+      "\nSuccessfully processed %d seasons\n",
+      length(all_historical_matchups)
+    ))
     cat(sprintf("Total matchups: %d\n", nrow(combined_matchups)))
     
     return(combined_matchups)
@@ -286,9 +287,11 @@ get_all_historical_matchups <- function(league_id, sleeper_players_csv, max_week
 }
 
 # Usage:
-all_historical_matchups <- get_all_historical_matchups(league_id = league_id, 
-                                                       sleeper_players_csv = sleeper_players_csv,
-                                                       max_weeks = 17)
+all_historical_matchups <- get_all_historical_matchups(
+  league_id = league_id,
+  sleeper_players_csv = sleeper_players_csv,
+  max_weeks = 17
+)
 
 
 # Define the target manager and the specific group
@@ -302,8 +305,8 @@ trevor_games <- all_historical_matchups[all_historical_matchups$manager_id == ta
 # First, create a helper to find opponents
 get_opponent_id <- function(week, matchup_id, manager_id, df) {
   # Find the other team in the same week and matchup
-  opponent <- df[df$week == week & 
-                   df$matchup_id == matchup_id & 
+  opponent <- df[df$week == week &
+                   df$matchup_id == matchup_id &
                    df$manager_id != manager_id, ]
   if (nrow(opponent) > 0) {
     return(opponent$manager_id[1])
@@ -313,11 +316,13 @@ get_opponent_id <- function(week, matchup_id, manager_id, df) {
 }
 
 # Add opponent_id column to trevor_games
-trevor_games$opponent_id <- mapply(get_opponent_id, 
-                                   trevor_games$week, 
-                                   trevor_games$matchup_id, 
-                                   trevor_games$manager_id,
-                                   MoreArgs = list(df = all_historical_matchups))
+trevor_games$opponent_id <- mapply(
+  get_opponent_id,
+  trevor_games$week,
+  trevor_games$matchup_id,
+  trevor_games$manager_id,
+  MoreArgs = list(df = all_historical_matchups)
+)
 
 # 1. Overall win/loss record
 overall_wins <- sum(trevor_games$winner == 1)
@@ -350,3 +355,44 @@ summary_df <- data.frame(
 )
 
 print(summary_df)
+
+
+
+
+
+
+
+
+library(dplyr)
+
+# Average points per team per week
+avg_points_per_week <- all_matchups %>%
+  group_by(manager_id, team_name) %>%
+  summarise(
+    avg_points = mean(team_points, na.rm = TRUE),
+    weeks_played = n(),
+    .groups = "drop"
+  )
+
+opponent_comparison_summary <- all_matchups %>%
+  group_by(week, matchup_id) %>%
+  mutate(opponent_points = if_else(row_number() == 1, last(team_points), first(team_points))) %>%
+  ungroup() %>%
+  left_join(all_matchups %>%
+              group_by(manager_id) %>%
+              summarise(team_avg = mean(team_points, na.rm = TRUE)),
+            by = "manager_id") %>%
+  mutate(opponent_diff_from_avg = opponent_points - team_avg) %>%
+  group_by(manager_id, team_name) %>%
+  summarise(
+    avg_opponent_diff = mean(opponent_diff_from_avg, na.rm = TRUE),
+    games_played = n(),
+    .groups = "drop"
+  ) %>%
+  left_join(team_photos, by = "team_name")
+
+opponent_comparison_json <- jsonlite::toJSON(opponent_comparison_summary, pretty = TRUE)
+opponent_comparison_file_path <- generate_file_path(current_year = current_year,
+                                                    current_week = current_week,
+                                                    file_name = "opponentComparison.json")
+write_json_to_file(opponent_comparison_json, opponent_comparison_file_path)
