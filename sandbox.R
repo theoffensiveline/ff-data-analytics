@@ -396,3 +396,91 @@ opponent_comparison_file_path <- generate_file_path(current_year = current_year,
                                                     current_week = current_week,
                                                     file_name = "opponentComparison.json")
 write_json_to_file(opponent_comparison_json, opponent_comparison_file_path)
+
+
+
+
+
+###### Divisions ######
+
+library(dplyr)
+
+divisions <- data.frame(
+  manager_id = c(2, 4, 8, 11, 3, 6, 7, 9, 1, 5, 10, 12),
+  division = c(rep("Hubbell", 4), rep("Glizzy", 4), rep("Avon", 4))
+)
+
+# Calculate records against each division
+division_records <- all_matchups %>%
+  # Add division info for each team
+  left_join(divisions, by = "manager_id") %>%
+  rename(team_division = division) %>%
+  # For each matchup, find the opponent's division
+  group_by(week, matchup_id) %>%
+  mutate(
+    opponent_manager_id = rev(manager_id),
+    opponent_division = rev(team_division)
+  ) %>%
+  ungroup() %>%
+  # Group by team and opponent division to calculate records
+  group_by(manager_id, team_name, team_division, opponent_division) %>%
+  summarise(
+    games = n(),
+    wins = sum(winner),
+    losses = games - wins,
+    .groups = "drop"
+  ) %>%
+  arrange(manager_id, opponent_division)
+
+# View the results
+print(division_records)
+
+division_records_json <- jsonlite::toJSON(division_records, pretty = TRUE)
+division_records_file_path <- generate_file_path(current_year = current_year,
+                                                 current_week = current_week,
+                                                 file_name = "divisionRecords.json")
+write_json_to_file(division_records_json, division_records_file_path)
+
+
+
+# Calculate each division's overall record (excluding intra-division games)
+division_overall_records <- all_matchups %>%
+  # Add division info for each team
+  left_join(divisions, by = "manager_id") %>%
+  rename(team_division = division) %>%
+  # For each matchup, find the opponent's division
+  group_by(week, matchup_id) %>%
+  mutate(
+    opponent_manager_id = rev(manager_id),
+    opponent_division = rev(team_division)
+  ) %>%
+  ungroup() %>%
+  # Exclude intra-division games
+  filter(team_division != opponent_division) %>%
+  # Group by division to sum up wins and losses
+  group_by(team_division) %>%
+  summarise(
+    teams = n_distinct(manager_id),
+    games = n(),
+    wins = sum(winner),
+    losses = games - wins,
+    win_pct = wins / games,
+    .groups = "drop"
+  ) %>%
+  arrange(desc(win_pct))
+
+# Check which teams are in each division
+all_matchups %>%
+  distinct(manager_id, team_name) %>%
+  left_join(divisions, by = "manager_id") %>%
+  arrange(division, manager_id)
+
+# View the results
+print(division_overall_records)
+
+division_overall_records_json <- jsonlite::toJSON(division_overall_records, pretty = TRUE)
+division_overall_records_file_path <- generate_file_path(current_year = current_year,
+                                                         current_week = current_week,
+                                                         file_name = "divisionOverallRecords.json")
+write_json_to_file(division_overall_records_json,
+                   division_overall_records_file_path)

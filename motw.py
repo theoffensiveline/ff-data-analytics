@@ -6,8 +6,8 @@ import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 
 CURRENT_YEAR = 25
-CURRENT_WEEK = 11
-CURRENT_CHAMPION = "Uncle Rico Went Pro"
+CURRENT_WEEK = 12
+CURRENT_CHAMPION = "WalterPickens"
 matchups = [['Week', 'Champion', 'Opponent']]
 
 
