@@ -50,19 +50,19 @@ playoff_output <- playoff_output %>%
 playoff_chances <- leaderboard_data[,c('Team')]
 playoff_chances
 playoff_chances$`Play-off %` <- c(100,
-                                  99.85,
-                                  98.7,
-                                  98.1,
-                                  56.67,
-                                  44.09,
-                                  56.67,
-                                  23.83,
-                                  20.79,
-                                  1.21,
-                                  0.09,
+                                  100,
+                                  97.79,
+                                  91.56,
+                                  63.34,
+                                  43.96,
+                                  64.05,
+                                  33.38,
+                                  5.92,
+                                  0,
+                                  0,
                                   0)
-playoff_chances$`WP Playoff %` <- c(100, 98, 99, 98, 52, 21, 60, 55, 14, 0.1, 1, 0.1)
-playoff_chances$`Last %` <- c(0, 0, 0, 0, 0, 0, 0, 0, 0.05, 3.07, 14.4, 82.48)
+playoff_chances$`WP Playoff %` <- c(100, 98, 99, 95, 84, 61, 34, 23, 4, 0.1, 0.1, 0)
+playoff_chances$`Last %` <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 15.24, 52.89, 31.87)
 
 playoff_output <- merge(playoff_output, playoff_chances)
 

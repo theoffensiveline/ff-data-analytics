@@ -6,8 +6,8 @@ import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 
 CURRENT_YEAR = 25
-CURRENT_WEEK = 12
-CURRENT_CHAMPION = "WalterPickens"
+CURRENT_WEEK = 13
+CURRENT_CHAMPION = "BBCU"
 matchups = [['Week', 'Champion', 'Opponent']]
 
 
@@ -78,7 +78,7 @@ def main():
                            graph_attr={'rankdir': 'LR'})
 
     tree, dot = build(CURRENT_CHAMPION, CURRENT_WEEK-1,
-                      CURRENT_WEEK + 2, schedule, dot, str(uuid.uuid1()))
+                      CURRENT_WEEK + 1, schedule, dot, str(uuid.uuid1()))
 
     # Use raw string for the file path to avoid issues with backslashes
     path = os.path.join("..", "theoffensiveline-site", "src", "newsletters", 

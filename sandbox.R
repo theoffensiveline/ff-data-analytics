@@ -469,12 +469,6 @@ division_overall_records <- all_matchups %>%
   ) %>%
   arrange(desc(win_pct))
 
-# Check which teams are in each division
-all_matchups %>%
-  distinct(manager_id, team_name) %>%
-  left_join(divisions, by = "manager_id") %>%
-  arrange(division, manager_id)
-
 # View the results
 print(division_overall_records)
 
@@ -484,3 +478,70 @@ division_overall_records_file_path <- generate_file_path(current_year = current_
                                                          file_name = "divisionOverallRecords.json")
 write_json_to_file(division_overall_records_json,
                    division_overall_records_file_path)
+
+
+
+
+
+
+
+
+
+# Calculate metrics per team
+starting_lineup_data <- all_players %>%
+  filter(!is.na(starter_id)) %>%
+  group_by(manager_id, team_name) %>%
+  summarize(
+    strength = mean(points, na.rm = TRUE),
+    cv = (sd(points, na.rm = TRUE) / mean(points, na.rm = TRUE)) * 100,
+    balance = 100 / (1 + cv),  # Inverse transform so higher = more balanced
+    .groups = 'drop'
+  ) %>%
+  left_join(team_photos, by = "team_name")
+
+print(starting_lineup_data)
+
+starting_lineup_data_json <- jsonlite::toJSON(starting_lineup_data, pretty = TRUE)
+starting_lineup_data_file_path <- generate_file_path(current_year = current_year,
+                                                         current_week = current_week,
+                                                         file_name = "startingLineupData.json")
+write_json_to_file(starting_lineup_data_json,
+                   starting_lineup_data_file_path)
+
+
+
+# Scatter plot
+ggplot(team_metrics, aes(x = strength, y = balance, label = team_name)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_text(hjust = -0.1, size = 3) +
+  geom_vline(xintercept = median(team_metrics$strength), 
+             linetype = "dashed", alpha = 0.5) +
+  geom_hline(yintercept = median(team_metrics$balance), 
+             linetype = "dashed", alpha = 0.5) +
+  labs(
+    title = "Starting Lineup: Strength vs Balance",
+    x = "Strength (Mean Points per Starter)",
+    y = "Balance (Lower CV = Higher Balance)",
+    caption = "Top-right quadrant = Strong & Balanced (ideal)"
+  ) +
+  theme_minimal()
+
+
+
+
+library(dplyr)
+
+all_matchups %>%
+  group_by(week) %>%
+  mutate(weekly_median = median(team_points)) %>%
+  ungroup() %>%
+  filter(winner == 0) %>%
+  mutate(above_median = team_points > weekly_median) %>%
+  group_by(team_name) %>%
+  summarise(
+    losses_above_median = sum(above_median),
+    losses_below_median = sum(!above_median),
+    total_losses = n()
+  ) %>%
+  arrange(desc(losses_above_median))
+
