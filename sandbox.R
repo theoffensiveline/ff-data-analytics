@@ -545,3 +545,130 @@ all_matchups %>%
   ) %>%
   arrange(desc(losses_above_median))
 
+
+
+library(dplyr)
+
+# Step 1: Identify Chris Olave and Ladd McConkey in the data
+# First, let's find their player IDs
+chris_olave_data <- all_players %>%
+  filter(full_name == "Chris Olave")
+
+ladd_mcconkey_data <- all_players %>%
+  filter(full_name == "Ladd McConkey")
+
+# Check their player IDs
+unique(chris_olave_data$players)
+unique(ladd_mcconkey_data$players)
+
+# Step 2: Track their original and current teams by week
+chris_original_manager <- 8
+ladd_original_manager <- 5
+
+# Identify when trades happened
+chris_trades <- chris_olave_data %>%
+  arrange(week) %>%
+  select(week, manager_id, points, matchup_id)
+
+ladd_trades <- ladd_mcconkey_data %>%
+  arrange(week) %>%
+  select(week, manager_id, points, matchup_id)
+
+print("Chris Olave by week:")
+print(chris_trades)
+print("Ladd McConkey by week:")
+print(ladd_trades)
+
+# Step 3: Calculate point adjustments needed
+# For weeks where they were on different teams than original
+point_adjustments <- bind_rows(
+  chris_olave_data %>%
+    filter(manager_id != chris_original_manager) %>%
+    mutate(
+      original_manager = chris_original_manager,
+      current_manager = manager_id,
+      player_name = "Chris Olave"
+    ),
+  ladd_mcconkey_data %>%
+    filter(manager_id != ladd_original_manager) %>%
+    mutate(
+      original_manager = ladd_original_manager,
+      current_manager = manager_id,
+      player_name = "Ladd McConkey"
+    )
+) %>%
+  select(week, player_name, points, original_manager, current_manager, matchup_id)
+
+print("Point adjustments needed:")
+print(point_adjustments)
+
+# Step 4: Create adjusted matchups dataset
+all_matchups_adjusted <- all_matchups
+
+# Apply point adjustments
+for(i in 1:nrow(point_adjustments)) {
+  adj_week <- point_adjustments$week[i]
+  adj_points <- point_adjustments$points[i]
+  original_mgr <- point_adjustments$original_manager[i]
+  current_mgr <- point_adjustments$current_manager[i]
+  
+  # Subtract points from current manager
+  all_matchups_adjusted <- all_matchups_adjusted %>%
+    mutate(team_points = ifelse(week == adj_week & manager_id == current_mgr,
+                                team_points - adj_points,
+                                team_points))
+  
+  # Add points to original manager
+  all_matchups_adjusted <- all_matchups_adjusted %>%
+    mutate(team_points = ifelse(week == adj_week & manager_id == original_mgr,
+                                team_points + adj_points,
+                                team_points))
+}
+
+# Step 5: Recalculate winners for each matchup
+all_matchups_adjusted <- all_matchups_adjusted %>%
+  group_by(week, matchup_id) %>%
+  mutate(winner = ifelse(team_points == max(team_points), 1, 0)) %>%
+  ungroup()
+
+# Step 6: Compare original vs adjusted
+comparison <- all_matchups %>%
+  select(week, manager_id, team_name, matchup_id, 
+         original_points = team_points, original_winner = winner) %>%
+  left_join(
+    all_matchups_adjusted %>%
+      select(week, manager_id, adjusted_points = team_points, adjusted_winner = winner),
+    by = c("week", "manager_id")
+  ) %>%
+  mutate(
+    points_diff = adjusted_points - original_points,
+    outcome_changed = original_winner != adjusted_winner
+  )
+
+# Show matchups where outcomes changed
+changed_matchups <- comparison %>%
+  filter(outcome_changed == TRUE | points_diff != 0) %>%
+  arrange(week, matchup_id)
+
+print("Matchups with changed outcomes or points:")
+print(changed_matchups)
+
+# Summary of changes
+summary_changes <- comparison %>%
+  filter(outcome_changed == TRUE) %>%
+  group_by(team_name, manager_id) %>%
+  summarize(
+    games_outcome_changed = n(),
+    wins_gained = sum(adjusted_winner == 1 & original_winner == 0),
+    wins_lost = sum(adjusted_winner == 0 & original_winner == 1),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(games_outcome_changed))
+
+print("Summary of outcome changes by team:")
+print(summary_changes)
+
+# Final adjusted dataset
+print("Adjusted all_matchups dataset ready!")
+head(all_matchups_adjusted)
+

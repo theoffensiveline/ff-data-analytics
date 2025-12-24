@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 1253779168802377728 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 15 #NFL_state$display_week
+current_week <- 16 #NFL_state$display_week
 current_year <- 25
 
 # team photos
