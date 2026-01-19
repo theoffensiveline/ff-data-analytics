@@ -19,11 +19,11 @@ library(rcartocolor)
 
 # Define the league ID, sleeper players file, and get NFL state
 # league_id <- 968890022248103936 # Walter league
-league_id <- 1124831356770058240 # main league
+league_id <- 1253779168802377728 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
 current_week <- 17 #NFL_state$display_week
-current_year <- 24
+current_year <- 25
 
 # team photos
 team_photos <- get_team_photos(league_id)
@@ -44,7 +44,7 @@ all_matchups <-
 # get MotW data
 motw_data <- add_motw_to_matchups(
   matchup_data = all_matchups,
-  week_1_matchup_id = 2,
+  week_1_matchup_id = 1,
   max_week = current_week,
   player_data = all_players
 )
@@ -455,20 +455,20 @@ best_ball_bench <- best_ball_lineups %>%
 
 best_ball_bench$color_bench <-
   spec_color2_scale(best_ball_bench$points,
-                    scale_from = c(0, 51.5),
+                    scale_from = c(0, 44.3),
                     direction = 1)
 
 best_ball_bench$color_starter <-
   spec_color2_scale(
     best_ball_bench$points_starter,
-    scale_from = c(-2, 24.18),
+    scale_from = c(-4, 26.28),
     direction = 1
   )
 
 best_ball_bench$color_points_over_starter <-
   spec_color2_scale(
     best_ball_bench$points_over_starter,
-    scale_from = c(0, 51.5),
+    scale_from = c(0, 33.3),
     direction = -1
   )
 
@@ -500,7 +500,7 @@ recap_data <- best_ball_bench %>%
 
 
 # draft info
-draft_id <- "1124831356770058241"
+draft_id <- "1253779168810774528"
 
 draft_data <- get_draft_picks(draft_id = draft_id)
 
@@ -778,116 +778,116 @@ recap_awards <- data.frame(
 recap_awards <- rbind(
   recap_awards,
   list(
-    name = "Pink Pony Kupp",
-    photo = "https://sleepercdn.com/uploads/3cdeac6447a59d22994c88379ba9bce8",
+    name = "The Barkley Brawlers",
+    photo = "https://sleepercdn.com/uploads/f6acb0a5169c52b59e2272361933c805.jpg",
     award = "League Champion",
-    value = "Defeated Costo Guys in the championship",
-    description = "Congrats to Pink Pony Kupp on a hard fought victory"
+    value = "Defeated Uncle Rico Went Pro in the championship",
+    description = "Congrats to The Barkley Brawlers on their first championship"
   ),
   list(
-    name = "League Loser Prophecy",
-    photo = "https://sleepercdn.com/uploads/a245e54037dc499725dcab05fb9ebbad.jpg",
+    name = "Bye Week Curious",
+    photo = "https://sleepercdn.com/uploads/3f2ce411ee3f87936b4648a58e78ee85.jpg",
     award = "Sucks At Fantasy Football",
-    value = "5-9 Record",
-    description = "They have completed 50% of this league's last place punishments"
+    value = "4-10 Record",
+    description = "They are tied for the most losses in league history"
   ),
   list(
-    name = "Joe Burrow",
-    photo = "https://sleepercdn.com/content/nfl/players/6770.jpg",
+    name = "Chris Olave",
+    photo = "https://sleepercdn.com/content/nfl/players/8144.jpg",
     award = "Finals MVP",
-    value = "36.98 points",
-    description = "Burrow put up nearly 37 points in the championship win, not bad for a 9th round pick"
+    value = "25.9 points",
+    description = "Olave put up 25.9 in the finals and was instrumental in this team making it there"
   ),
   list(
-    name = "Lamar Jackson",
-    photo = "https://sleepercdn.com/content/nfl/players/4881.jpg",
+    name = "Christian McCaffrey",
+    photo = "https://sleepercdn.com/content/nfl/players/4034.jpg",
     award = "League MVP",
-    value = "407.40 points - 25.46 ppg",
-    description = "Should this have been Josh Allen? Probably, but we won't get into that debate here"
+    value = "376.8 points - 25.1 PPG",
+    description = "30 more points and 2.3 PPG more than the next highest player"
   ),
   list(
-    name = "Just Joshin pt. 2",
-    photo = "https://sleepercdn.com/uploads/f266ea37455022ae9a07a2c6644ace5e.jpg",
+    name = "BBCU",
+    photo = "https://sleepercdn.com/uploads/07e4a08de2c45ee92d7a5498e5234fbb",
     award = "Offensive Team of The Year",
-    value = "1772.88 PF",
-    description = "Scored the most points to earn the #1 seed"
+    value = "1852.36 PF",
+    description = "Only team ever with 1800+ points for in a season"
   ),
   list(
-    name = "Costo Guys",
-    photo = "https://sleepercdn.com/uploads/ed33dc321d46f8acd298bf79617d512e.jpg",
+    name = "The Barkley Brawlers",
+    photo = "https://sleepercdn.com/uploads/f6acb0a5169c52b59e2272361933c805.jpg",
     award = "Defensive Team of The Year",
-    value = "1527.96 PA",
-    description = "This is 130 more PA than last year's winner, Just Joshin"
+    value = "1425.94 PA",
+    description = "This is their second time winning this award, won in 2023"
   ),
   list(
-    name = "Youngster Joey",
-    photo = "https://sleepercdn.com/uploads/006bf4340223cac66abcf1f51402875e",
+    name = "The Barkley Brawlers",
+    photo = "https://sleepercdn.com/uploads/f6acb0a5169c52b59e2272361933c805.jpg",
     award = "Best MotW Manager",
     value = "3-1 record",
-    description = "7:1 Hot Dog/Shot Given:Taken Ratio"
+    description = "16:3 Hot Dog/Shot Given:Taken Ratio"
   ),
   list(
-    name = "Twin Bowers",
-    photo = "https://sleepercdn.com/uploads/1bd211e3f19b67fc2cad3efb8ca5544a.jpg",
+    name = "2nd Half Team",
+    photo = "https://sleepercdn.com/uploads/9c3413a27399623b1a44d5a1d9149edd.jpg",
     award = "Worst MotW Manager",
     value = "0-2 record",
     description = "0:10 Hot Dog/Shot Given:Taken Ratio"
   ),
   list(
-    name = "Brock Bowers",
-    photo = "https://sleepercdn.com/content/nfl/players/11604.jpg",
+    name = "Jaxon Smith-Njigba",
+    photo = "https://sleepercdn.com/content/nfl/players/9488.jpg",
     award = "Best Draft Pick",
-    value = "221.3 points - 15.81 ppg",
-    description = "Pick 9.11 by Twin Bowers, finished as our leagues TE1 in total points"
+    value = "327.2 points - 21.81 PPG",
+    description = "Pick 3.02 by BBCU, finished as our leagues WR2 in total points"
   ),
   list(
-    name = "Patrick Mahomes",
-    photo = "https://sleepercdn.com/content/nfl/players/4046.jpg",
+    name = "Justin Jefferson",
+    photo = "https://sleepercdn.com/content/nfl/players/6794.jpg",
     award = "Worst Draft Pick",
-    value = "238.84 points - 17.06 ppg",
-    description = "Pick 3.12 by Giving Me a Chubb, 7 picks ahead of League MVP Lamar Jackson"
+    value = "178.9 points - 11.93 ppg",
+    description = "Pick 1.08 by Worse Management, 4 picks ahead of WR1 Puka Nacua"
   ),
   list(
-    name = "Bucky Irving",
-    photo = "https://sleepercdn.com/content/nfl/players/11584.jpg",
+    name = "Michael Wilson",
+    photo = "https://sleepercdn.com/content/nfl/players/10232.jpg",
     award = "Best Waiver Pickup",
-    value = "122.8 points - 17.54 ppg",
-    description = "Pink Pony Kupp spent $102 FAAB - scored 23 and 16.4 points in playoff games"
+    value = "115.1 points - 19.18 ppg",
+    description = "The Barkley Brawlers spent $21 FAAB - averaged 20 PPG in weeks 16-17"
   ),
   list(
-    name = "Jaleel McLaughlin",
-    photo = "https://sleepercdn.com/content/nfl/players/11439.jpg",
+    name = "Sean Tucker",
+    photo = "https://sleepercdn.com/content/nfl/players/9506.jpg",
     award = "Worst Waiver Pickup",
-    value = "33.1 points - 4.73 ppg",
-    description = "Lowest ppg of any player started more than 3 times"
+    value = "5.6 points - 5.6 ppg",
+    description = "Costco Guys spent $125 FAAB - started him once for 5.6 points"
   ),
   list(
-    name = "First Down Syndrome",
-    photo = "https://sleepercdn.com/uploads/8e97327c2904ce15283e72e27977734b.jpg",
+    name = "BBCU",
+    photo = "https://sleepercdn.com/uploads/07e4a08de2c45ee92d7a5498e5234fbb",
     award = "Best Start/Sits",
-    value = "19 incorrect decisions - 179.3 points lost",
-    description = "Clutched up when it counted to avoid last place"
+    value = "22 incorrect decisions - 208.98 points lost",
+    description = "Having an elite starting lineup helps make decisions easy"
   ),
   list(
-    name = "Just Joshin pt. 2",
-    photo = "https://sleepercdn.com/uploads/f266ea37455022ae9a07a2c6644ace5e.jpg",
+    name = "The Barkley Brawlers",
+    photo = "https://sleepercdn.com/uploads/f6acb0a5169c52b59e2272361933c805.jpg",
     award = "Worst Start/Sits",
-    value = "31 incorrect decisions - 334.32 points lost",
-    description = "Could've won the championship if not for mismanagement"
+    value = "40 incorrect decisions - 432.6 points lost",
+    description = "2nd straight year winning this award, but they won the chip anyway"
   ),
   list(
-    name = "Kirk Thuggins & The Boys",
-    photo = "https://sleepercdn.com/uploads/4a648c2339b3183b3287cbff2364efc3.jpg",
+    name = "The Barkley Brawlers",
+    photo = "https://sleepercdn.com/uploads/f6acb0a5169c52b59e2272361933c805.jpg",
     award = "Best Trader",
-    value = "3-0 record in trades - Netted 226 points",
-    description = "'Fleeced' to get Jonathan Taylor and Baker Mayfield"
+    value = "1-0 record in trades - Netted 76 points",
+    description = "Won the championship because of this one trade"
   ),
   list(
-    name = "Youngster Joey",
-    photo = "https://sleepercdn.com/uploads/006bf4340223cac66abcf1f51402875e",
+    name = "BBCU",
+    photo = "https://sleepercdn.com/uploads/07e4a08de2c45ee92d7a5498e5234fbb",
     award = "Worst Trader",
-    value = "3-3 record in trades - Netted -178.7 points",
-    description = "Back-to-back winner of this award"
+    value = "1-3 record in trades - Netted -76 points",
+    description = "Back-to-back-to-back winner of this award, would've won the championship if they didn't trade"
   )
 )
 
