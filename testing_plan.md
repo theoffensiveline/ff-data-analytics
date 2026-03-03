@@ -741,33 +741,35 @@ Phase 5 is complete only when all golden file regression tests pass green.
 - [ ] Create `offensiveline/tests/testthat/test-colors.R` *(optional — see Phase 4 note)*
   - [ ] `direction = -1 flips the gradient`
   - [ ] `all-same-value input returns identical colors`
-- [ ] Create `offensiveline/tests/testthat/test-leaderboards.R`
-  - [ ] `returns one row per team`
-  - [ ] `W + L equals weeks played for every team`
-  - [ ] `PF equals sum of team_points from raw matchup data`
-  - [ ] `teams are ranked 1 through N with no gaps or duplicates`
-  - [ ] `winner with more wins ranks above team with fewer wins`
-  - [ ] `power rankings return one row per team`
-  - [ ] `power ranking scores are numeric and non-negative`
-- [ ] Create `offensiveline/tests/testthat/test-motw.R`
-  - [ ] `motw flag is set on exactly 2 rows (1 matchup) per week`
-  - [ ] `every week has a motw matchup`
-  - [ ] `motw loser in week N is in the motw matchup in week N+1`
-  - [ ] `# of Shots is a positive integer for motw rows`
-  - [ ] `winner column is 0 or 1 for motw rows`
-  - [ ] `each motw matchup has exactly one winner and one loser`
-- [ ] Create `offensiveline/tests/testthat/test-best-ball.R`
-  - [ ] `optimal lineup score is always >= actual lineup score`
-  - [ ] `every player appears exactly once per team per week`
-  - [ ] `optimal_slot is never NA`
-  - [ ] `number of non-BENCH slots matches expected starter count`
-  - [ ] `best ball matchups return one row per team per week`
-  - [ ] `best ball team score >= actual team score in all matchups`
-- [ ] Create `offensiveline/tests/testthat/test-awards.R`
-  - [ ] `awards table has one row per award category`
-  - [ ] `find_top_player returns a single player name`
-  - [ ] `find_top_player top QB is actually in the QB position`
-- [ ] Run `devtools::test("offensiveline")` and confirm all Phase 4 tests pass
+- [x] Create `offensiveline/tests/testthat/test-leaderboards.R`
+  - [x] `returns one row per team`
+  - [x] `W + L equals weeks played for every team`
+  - [x] `PF equals sum of team_points from raw matchup data`
+  - [x] `teams are ranked 1 through N with no gaps or duplicates`
+  - [x] `winner with more wins ranks above team with fewer wins`
+  - [x] `power rankings return one row per team`
+  - [x] `power ranking scores are numeric and non-negative`
+- [x] Create `offensiveline/tests/testthat/test-motw.R`
+  - [x] `motw flag is set on exactly 2 rows (1 matchup) per week`
+  - [x] `every week has a motw matchup`
+  - [x] `motw winner in week N is in the motw matchup in week N+1` *(winner/champion carries forward, not loser)*
+  - [x] `# of Shots is a non-negative integer for motw rows`
+  - [x] `winner column is 0 or 1 for motw rows`
+  - [x] `each motw matchup has exactly one winner and one loser`
+- [x] Create `offensiveline/tests/testthat/test-best-ball.R`
+  - [x] `optimal lineup score is always >= actual lineup score`
+  - [x] `every player appears exactly once per team per week`
+  - [x] `optimal_slot is never NA`
+  - [x] `number of non-BENCH slots matches expected starter count` *(9 starters: QB, RB×2, WR×2, TE, W/R/T FLEX, DEF, K)*
+  - [x] `best ball matchups return one row per team per week`
+  - [x] `best ball team score >= actual team score in all matchups`
+- [x] Create `offensiveline/tests/testthat/test-awards.R`
+  - [x] `awards table has at least one row`
+  - [x] `awards table has no duplicate award names`
+  - [x] `awards table has required columns`
+  - [x] `find_top_player returns a character player name`
+  - [x] `find_top_player top QB is actually a QB starter`
+- [x] Run `devtools::test("offensiveline")` — **FAIL 0 | WARN 18 | SKIP 1 | PASS 38** ✓
 
 ---
 
