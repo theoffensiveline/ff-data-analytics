@@ -2,7 +2,7 @@
 # Generates golden JSON files from fixtures without hitting the Sleeper API
 
 library(sleeperapi)
-library(offensiveline)
+devtools::load_all("offensiveline")  # load source code, not installed copy
 library(dplyr)
 library(tidyr)
 library(scales)

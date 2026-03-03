@@ -685,7 +685,7 @@ Phase 5 is complete only when all golden file regression tests pass green.
   - [x] `motw_w3.rds`
   - [x] `transactions_w3.rds`
 - [x] Add `offensiveline/tests/testthat.R` entry point file
-- [ ] Commit all fixture `.rds` files and the entry point to git
+- [x] Commit all fixture `.rds` files and the entry point to git
 
 ---
 
@@ -715,24 +715,24 @@ Phase 5 is complete only when all golden file regression tests pass green.
   - [x] `power_rankings.json`
   - [x] `schedule.json`
   - [x] `shots_dist.json`
-- [ ] Commit all 15 golden `.json` files to git
+- [x] Commit all 15 golden `.json` files to git
 
 ---
 
 ### Phase 3 — Regression Tests Against Golden Files
 
-- [ ] Create `offensiveline/tests/testthat/test-snapshots.R`
-- [ ] Add the `compare_to_golden()` helper function
-- [ ] Write regression test for `leaderboard_to_json`
-- [ ] Write regression test for `awards_to_json`
-- [ ] Write regression test for `motw_table_to_json`
-- [ ] Write regression test for `efficiency_to_json`
-- [ ] Write regression test for `power_rankings_to_json`
-- [ ] Write regression test for `schedule_comparison_to_json`
-- [ ] Write regression test for `best_ball_lb_to_json`
-- [ ] Write regression test for `shots_dist_to_json`
-- [ ] Write regression test for `recap_data` / `build_recap_data()` *(will fail — expected)*
-- [ ] Run `devtools::test("offensiveline")` and confirm 8 main.R tests pass, 1 recap test fails
+- [x] Create `offensiveline/tests/testthat/test-snapshots.R`
+- [x] Add the `compare_to_golden()` helper function
+- [x] Write regression test for `leaderboard_to_json`
+- [x] Write regression test for `awards_to_json`
+- [x] Write regression test for `motw_table_to_json`
+- [x] Write regression test for `efficiency_to_json`
+- [x] Write regression test for `power_rankings_to_json`
+- [x] Write regression test for `schedule_comparison_to_json`
+- [x] Write regression test for `best_ball_lb_to_json`
+- [x] Write regression test for `shots_dist_to_json`
+- [x] Write regression test for `recap_data` / `build_recap_data()` *(skipped until Phase 5)*
+- [x] Run `devtools::test("offensiveline")` — **FAIL 0 | WARN 5 | SKIP 1 | PASS 8** ✓
 
 ---
 
