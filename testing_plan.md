@@ -775,31 +775,35 @@ Phase 5 is complete only when all golden file regression tests pass green.
 
 ### Phase 5 — Extract Recap Logic & Pass Regression Tests
 
-- [ ] Create `offensiveline/R/recap.R`
-- [ ] Extract `summarize_win_loss_extremes()` from `end_of_season_recap.R` lines 125–154
-- [ ] Extract `summarize_motw_record()` from lines 158–185
-- [ ] Extract `summarize_motw_given()` from lines 188–207
-- [ ] Extract `summarize_weekly_rank()` from lines 210–261
-- [ ] Extract `summarize_pt_diff()` from lines 264–316
-- [ ] Extract `evaluate_trades()` from lines 566–641
-- [ ] Create `build_recap_data()` that orchestrates all of the above into a single call
-- [ ] Export all new functions via `@export` roxygen tags and rebuild `NAMESPACE`
-- [ ] Create `offensiveline/tests/testthat/test-recap.R`
-  - [ ] Add `make_trade()` helper
-  - [ ] `evaluate_trades: team with higher total_points wins` (Branch 1)
-  - [ ] `evaluate_trades: tied total_points marks both as winner` (Branch 2)
-  - [ ] `evaluate_trades: no points, solo bidder wins` (Branch 3)
-  - [ ] `evaluate_trades: no points, non-bidder is marked 0` (Branch 4)
-  - [ ] `evaluate_trades: no points, higher FAAB bid wins` (Branch 5)
-  - [ ] `evaluate_trades: no points, equal bids = NA` (Branch 6)
-  - [ ] `evaluate_trades: no points, multiple max bidders = NA` (Branch 7)
-  - [ ] `summarize_win_loss_extremes: best win is highest scoring win`
-  - [ ] `summarize_win_loss_extremes: worst loss is lowest scoring loss`
-  - [ ] `summarize_win_loss_extremes: returns one row per team`
-  - [ ] `summarize_pt_diff: win differential is always positive`
-  - [ ] `summarize_pt_diff: close_games_1 + blowouts_1 <= total wins`
-- [ ] Run `devtools::test("offensiveline")` — confirm Phase 3 `recap_data` test now passes
-- [ ] Run full test suite and confirm everything is green
-- [ ] Update `end_of_season_recap.R` to call `build_recap_data()` instead of inline code
-- [ ] Delete the extracted inline pipelines from `end_of_season_recap.R`
-- [ ] Final run of full test suite — confirm still all green
+- [x] Create `offensiveline/R/recap.R`
+- [x] Extract `summarize_win_loss_extremes()` from `end_of_season_recap.R` lines 125–154
+- [x] Extract `summarize_motw_record()` from lines 158–185
+- [x] Extract `summarize_motw_given()` from lines 188–207
+- [x] Extract `summarize_weekly_rank()` from lines 210–261
+- [x] Extract `summarize_pt_diff()` from lines 264–316
+- [x] Extract `evaluate_trades()` from lines 566–641
+- [x] Create `build_recap_data()` that orchestrates all of the above into a single call
+- [x] Export all new functions via `@export` roxygen tags and rebuilt `NAMESPACE`
+- [x] Create `offensiveline/tests/testthat/test-recap.R`
+  - [x] Add `make_trade()` helper
+  - [x] `evaluate_trades: team with higher total_points wins` (Branch 1)
+  - [x] `evaluate_trades: tied total_points marks both as winner` (Branch 2)
+  - [x] `evaluate_trades: no points, solo bidder wins` (Branch 3)
+  - [x] `evaluate_trades: no points, non-bidder is marked 0` (Branch 4)
+  - [x] `evaluate_trades: no points, higher FAAB bid wins` (Branch 5)
+  - [x] `evaluate_trades: no points, equal bids = NA` (Branch 6)
+  - [x] `evaluate_trades: no points, multiple max bidders = NA` (Branch 7)
+  - [x] `summarize_win_loss_extremes: best win set for teams with wins`
+  - [x] `summarize_win_loss_extremes: worst loss <= best loss per team`
+  - [x] `summarize_win_loss_extremes: returns one row per team`
+  - [x] `summarize_pt_diff: win differential is always positive`
+  - [x] `summarize_pt_diff: close_games_1 + blowouts_1 <= total wins`
+- [x] Run `devtools::test("offensiveline")` — Phase 3 `recap_data` snapshot now passes ✓
+- [x] Run full test suite — **FAIL 0 | WARN 22 | SKIP 0 | PASS 55** ✓
+- [x] Update `end_of_season_recap.R` to call `build_recap_data()` instead of inline code
+- [x] Delete the extracted inline pipelines from `end_of_season_recap.R`
+- [x] Final run of full test suite — **FAIL 0 | WARN 22 | SKIP 0 | PASS 55** ✓
+
+> **Note**: Also fixed a pre-existing bug in `leaderboards.R` where bare `rescale()` was
+> called without `scales::` prefix — failed in clean Rscript sessions (worked in interactive
+> RStudio where `scales` was already on the search path). Fixed to `scales::rescale()`.

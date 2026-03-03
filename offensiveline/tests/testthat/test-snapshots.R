@@ -90,10 +90,13 @@ test_that("shots_dist_to_json matches golden", {
 # ── end_of_season_recap.R outputs (Phase 5) ──────────────────────────────────
 
 test_that("recap_data matches golden", {
-  skip("build_recap_data() not yet extracted — implement in Phase 5")
   all_transactions <- readRDS(test_path("fixtures", "transactions_full.rds"))
+  sleeper_players  <- readRDS(test_path("fixtures", "sleeper_players.rds"))
   compare_to_golden(
-    jsonlite::toJSON(build_recap_data(all_matchups, motw_data, all_transactions, all_players)),
+    jsonlite::toJSON(
+      build_recap_data(all_matchups, motw_data, all_transactions, all_players,
+                       sleeper_players = sleeper_players)
+    ),
     "recap_data.json"
   )
 })
