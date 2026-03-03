@@ -1,0 +1,58 @@
+[
+  {
+    "week": 17,
+    "team_name": "BBCU",
+    "actual_points": 145.94,
+    "max_points": 159.54,
+    "percentage": 91.4755
+  },
+  {
+    "week": 17,
+    "team_name": "Super Ja'Marrio Bros.",
+    "actual_points": 132.14,
+    "max_points": 147.74,
+    "percentage": 89.4409
+  },
+  {
+    "week": 17,
+    "team_name": "Worst Management",
+    "actual_points": 111.24,
+    "max_points": 148.74,
+    "percentage": 74.7882
+  },
+  {
+    "week": 17,
+    "team_name": "The Barkley Brawlers ",
+    "actual_points": 110.98,
+    "max_points": 154.52,
+    "percentage": 71.8224
+  },
+  {
+    "week": 17,
+    "team_name": "Uncle Rico Went Pro",
+    "actual_points": 102.16,
+    "max_points": 136.08,
+    "percentage": 75.0735
+  },
+  {
+    "week": 17,
+    "team_name": "Bye Week Curious",
+    "actual_points": 95.48,
+    "max_points": 103.98,
+    "percentage": 91.8254
+  },
+  {
+    "week": 17,
+    "team_name": "Worse Management",
+    "actual_points": 75.32,
+    "max_points": 91.52,
+    "percentage": 82.299
+  },
+  {
+    "week": 17,
+    "team_name": "Costco Guys",
+    "actual_points": 68.08,
+    "max_points": 86.88,
+    "percentage": 78.361
+  }
+]

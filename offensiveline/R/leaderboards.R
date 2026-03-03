@@ -76,12 +76,12 @@ create_power_rankings <-
         total_opp_rank = mean(number_of_teams - opponent_rank)
       ) %>%
       mutate(
-        team_ability = rescale(
+        team_ability = scales::rescale(
           round(play_all_w / max_week, 2),
           to = c(1, 100),
           from = c(0, number_of_teams - 1)
         ),
-        strength_of_schedule = rescale(
+        strength_of_schedule = scales::rescale(
           round(total_opp_rank, 2),
           to = c(1, 100),
           from = c(0, number_of_teams - 1)
@@ -118,12 +118,12 @@ create_power_rankings <-
       ) %>%
       distinct() %>%
       mutate(
-        `Team Ability` = rescale(
+        `Team Ability` = scales::rescale(
           round(`Play All W` / max_week, 2),
           to = c(1, 100),
           from = c(0, number_of_teams - 1)
         ),
-        `Str of Sched` = rescale(
+        `Str of Sched` = scales::rescale(
           round(total_opp_rank, 2),
           to = c(1, 100),
           from = c(0, number_of_teams - 1)

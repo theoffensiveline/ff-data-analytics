@@ -1,0 +1,134 @@
+[
+  {
+    "P Rank": 1,
+    "Trend": 0,
+    "Team": "BBCU",
+    "Play All W": 137,
+    "Play All L": 39,
+    "Team Ability": 73.54,
+    "Str of Sched": 61.21,
+    "TaColor": "#227740",
+    "SosColor": "#c74850"
+  },
+  {
+    "P Rank": 2,
+    "Trend": 0,
+    "Team": "Worst Management",
+    "Play All W": 117,
+    "Play All L": 59,
+    "Team Ability": 62.92,
+    "Str of Sched": 42.58,
+    "TaColor": "#88b290",
+    "SosColor": "#70a37c"
+  },
+  {
+    "P Rank": 3,
+    "Trend": 0,
+    "Team": "Uncle Rico Went Pro",
+    "Play All W": 106,
+    "Play All L": 81,
+    "Team Ability": 57.16,
+    "Str of Sched": 47.62,
+    "TaColor": "#b7d1bb",
+    "SosColor": "#c3d8c6"
+  },
+  {
+    "P Rank": 4,
+    "Trend": 2,
+    "Team": "The Barkley Brawlers ",
+    "Play All W": 94,
+    "Play All L": 93,
+    "Team Ability": 50.77,
+    "Str of Sched": 38.62,
+    "TaColor": "#f3f7f3",
+    "SosColor": "#227740"
+  },
+  {
+    "P Rank": 5,
+    "Trend": 2,
+    "Team": "Super Ja'Marrio Bros.",
+    "Play All W": 102,
+    "Play All L": 85,
+    "Team Ability": 55,
+    "Str of Sched": 58.69,
+    "TaColor": "#c3d8c6",
+    "SosColor": "#da7878"
+  },
+  {
+    "P Rank": 6,
+    "Trend": -2,
+    "Team": "WalterPickens",
+    "Play All W": 101,
+    "Play All L": 75,
+    "Team Ability": 54.46,
+    "Str of Sched": 55.54,
+    "TaColor": "#cfe0d2",
+    "SosColor": "#eeb0ae"
+  },
+  {
+    "P Rank": 7,
+    "Trend": -2,
+    "Team": "Lord of the Littles",
+    "Play All W": 98,
+    "Play All L": 78,
+    "Team Ability": 52.84,
+    "Str of Sched": 44.29,
+    "TaColor": "#dbe8dd",
+    "SosColor": "#88b290"
+  },
+  {
+    "P Rank": 8,
+    "Trend": 1,
+    "Team": "Costco Guys",
+    "Play All W": 85,
+    "Play All L": 102,
+    "Team Ability": 46,
+    "Str of Sched": 48.61,
+    "TaColor": "#f9dddc",
+    "SosColor": "#cfe0d2"
+  },
+  {
+    "P Rank": 9,
+    "Trend": -1,
+    "Team": "2nd Half Team ",
+    "Play All W": 80,
+    "Play All L": 96,
+    "Team Ability": 43.39,
+    "Str of Sched": 62.92,
+    "TaColor": "#f4c7c4",
+    "SosColor": "#bc293d"
+  },
+  {
+    "P Rank": 10,
+    "Trend": 0,
+    "Team": "First Down Syndrome",
+    "Play All W": 83,
+    "Play All L": 93,
+    "Team Ability": 44.92,
+    "Str of Sched": 55,
+    "TaColor": "#f7d2d0",
+    "SosColor": "#eeb0ae"
+  },
+  {
+    "P Rank": 11,
+    "Trend": 0,
+    "Team": "Worse Management",
+    "Play All W": 61,
+    "Play All L": 115,
+    "Team Ability": 33.31,
+    "Str of Sched": 52.75,
+    "TaColor": "#da7878",
+    "SosColor": "#f9dddc"
+  },
+  {
+    "P Rank": 12,
+    "Trend": 0,
+    "Team": "Bye Week Curious",
+    "Play All W": 46,
+    "Play All L": 130,
+    "Team Ability": 25.39,
+    "Str of Sched": 56.71,
+    "TaColor": "#bc293d",
+    "SosColor": "#e79a98"
+  }
+]
