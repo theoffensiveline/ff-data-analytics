@@ -1,0 +1,121 @@
+[
+  {
+    "award": "Best Managed Team",
+    "photo": "https://sleepercdn.com/uploads/07e4a08de2c45ee92d7a5498e5234fbb",
+    "name": "BBCU",
+    "value": "Scored 145.94 points",
+    "description": "This is the #23 score this season"
+  },
+  {
+    "award": "Most Mismanaged Team",
+    "photo": "https://sleepercdn.com/uploads/ed33dc321d46f8acd298bf79617d512e.jpg",
+    "name": "Costco Guys",
+    "value": "Scored 68.08 points",
+    "description": "This is the #2 lowest score this season"
+  },
+  {
+    "award": "Worst Winner",
+    "photo": "https://sleepercdn.com/uploads/3f2ce411ee3f87936b4648a58e78ee85.jpg",
+    "name": "Bye Week Curious",
+    "value": "Scored 95.48 points in their win",
+    "description": "This is the #4 worst winner this season"
+  },
+  {
+    "award": "Best Loser",
+    "photo": "https://sleepercdn.com/uploads/3e5b05611fe13542a6c270458f97ce8b.jpg",
+    "name": "Worst Management",
+    "value": "Scored 111.24 points in their loss",
+    "description": "This is the #25 best loser this season"
+  },
+  {
+    "award": "Deadest Horse",
+    "photo": "https://sleepercdn.com/uploads/8685a33e57e0a038b7c73bcce36c2628",
+    "name": "Super Ja'Marrio Bros.",
+    "value": "Defeated Costco Guys by 64.06 points",
+    "description": "This is the #8 biggest blowout this season"
+  },
+  {
+    "award": "Photo Finish",
+    "photo": "https://sleepercdn.com/uploads/f6acb0a5169c52b59e2272361933c805.jpg",
+    "name": "The Barkley Brawlers ",
+    "value": "Defeated Uncle Rico Went Pro by 8.82 points",
+    "description": "This is the #15 closest game this season"
+  },
+  {
+    "award": "Warmest Bench",
+    "photo": "https://sleepercdn.com/uploads/f6acb0a5169c52b59e2272361933c805.jpg",
+    "name": "The Barkley Brawlers ",
+    "value": "Left 43.54 points on the bench",
+    "description": "This is the #8 warmest bench this season"
+  },
+  {
+    "award": "Heaviest Top",
+    "photo": "https://sleepercdn.com/uploads/3f2ce411ee3f87936b4648a58e78ee85.jpg",
+    "name": "Bye Week Curious",
+    "value": "Left 8.5 points on the bench",
+    "description": "This is the #58 optimized lineup this season"
+  },
+  {
+    "award": "MVP",
+    "photo": "https://sleepercdn.com/content/nfl/players/9509.jpg",
+    "name": "Bijan Robinson (Mike Ehrmantraut)",
+    "value": "Scored 39.9 points for BBCU which was 27.34% of the team total",
+    "description": "This is the #23 MVP performance this season"
+  },
+  {
+    "award": "Bench MVP",
+    "photo": "https://sleepercdn.com/content/nfl/players/8183.jpg",
+    "name": "Brock Purdy",
+    "value": "Scored 36.92 points on the bench for The Barkley Brawlers ",
+    "description": "This is the #4 bench performance this season"
+  },
+  {
+    "award": "Literally Throwing",
+    "photo": "https://sleepercdn.com/content/nfl/players/11564.jpg",
+    "name": "Drake Maye",
+    "value": "Scored 32.44 points for Worst Management",
+    "description": "This is the #5 QB performance of the season"
+  },
+  {
+    "award": "Running Wild",
+    "photo": "https://sleepercdn.com/content/nfl/players/9509.jpg",
+    "name": "Bijan Robinson (Mike Ehrmantraut)",
+    "value": "Scored 39.9 points for BBCU",
+    "description": "This is the #4 RB performance of the season"
+  },
+  {
+    "award": "Widest Receiver",
+    "photo": "https://sleepercdn.com/content/nfl/players/8144.jpg",
+    "name": "Chris Olave",
+    "value": "Scored 25.9 points for The Barkley Brawlers ",
+    "description": "This is the #42 WR performance of the season"
+  },
+  {
+    "award": "Tightest End",
+    "photo": "https://sleepercdn.com/content/nfl/players/8130.jpg",
+    "name": "Trey McBride (Jesse Pinkman)",
+    "value": "Scored 23.6 points for BBCU",
+    "description": "This is the #12 TE performance of the season"
+  },
+  {
+    "award": "Das Boot",
+    "photo": "https://sleepercdn.com/content/nfl/players/11533.jpg",
+    "name": "Brandon Aubrey (GOAT)",
+    "value": "Scored 16.5 points for Super Ja'Marrio Bros.",
+    "description": "This is the #16 K performance of the season"
+  },
+  {
+    "award": "Biggest D 1",
+    "photo": "https://sleepercdn.com/images/team_logos/nfl/no.png",
+    "name": "NO",
+    "value": "Scored 13 points for The Barkley Brawlers ",
+    "description": "This is the #33 DEF performance of the season"
+  },
+  {
+    "award": "Biggest D 2",
+    "photo": "https://sleepercdn.com/images/team_logos/nfl/phi.png",
+    "name": "PHI",
+    "value": "Scored 13 points for Bye Week Curious",
+    "description": "This is the #33 DEF performance of the season"
+  }
+]

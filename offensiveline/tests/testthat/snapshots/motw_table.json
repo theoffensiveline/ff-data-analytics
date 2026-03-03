@@ -1,0 +1,189 @@
+[
+  {
+    "Week": 1,
+    "Winner Team": "Worst Management",
+    "Winner Score": 114.08,
+    "Loser Score": 91.76,
+    "Loser Team": "Uncle Rico Went Pro",
+    "# of Shots/Dogs": 4,
+    "WinnerScoreColor": "#f9dddc",
+    "LoserScoreColor": "#eaa5a3",
+    "ShotsDogsColor": "#cfe0d2"
+  },
+  {
+    "Week": 2,
+    "Winner Team": "Worst Management",
+    "Winner Score": 131,
+    "Loser Score": 95.92,
+    "Loser Team": "2nd Half Team ",
+    "# of Shots/Dogs": 5,
+    "WinnerScoreColor": "#dbe8dd",
+    "LoserScoreColor": "#eeb0ae",
+    "ShotsDogsColor": "#f7d2d0"
+  },
+  {
+    "Week": 3,
+    "Winner Team": "Worst Management",
+    "Winner Score": 129.62,
+    "Loser Score": 113.64,
+    "Loser Team": "WalterPickens",
+    "# of Shots/Dogs": 3,
+    "WinnerScoreColor": "#e7efe8",
+    "LoserScoreColor": "#f9dddc",
+    "ShotsDogsColor": "#7cab86"
+  },
+  {
+    "Week": 4,
+    "Winner Team": "Worst Management",
+    "Winner Score": 153.58,
+    "Loser Score": 123.22,
+    "Loser Team": "BBCU",
+    "# of Shots/Dogs": 3,
+    "WinnerScoreColor": "#9fc2a6",
+    "LoserScoreColor": "#f3f7f3",
+    "ShotsDogsColor": "#7cab86"
+  },
+  {
+    "Week": 5,
+    "Winner Team": "Costco Guys",
+    "Winner Score": 138.26,
+    "Loser Score": 98.02,
+    "Loser Team": "Worst Management",
+    "# of Shots/Dogs": 4,
+    "WinnerScoreColor": "#c3d8c6",
+    "LoserScoreColor": "#eeb0ae",
+    "ShotsDogsColor": "#cfe0d2"
+  },
+  {
+    "Week": 6,
+    "Winner Team": "BBCU",
+    "Winner Score": 154.76,
+    "Loser Score": 79.84,
+    "Loser Team": "Costco Guys",
+    "# of Shots/Dogs": 7,
+    "WinnerScoreColor": "#94ba9b",
+    "LoserScoreColor": "#df8482",
+    "ShotsDogsColor": "#bc293d"
+  },
+  {
+    "Week": 7,
+    "Winner Team": "BBCU",
+    "Winner Score": 154.8,
+    "Loser Score": 104.52,
+    "Loser Team": "2nd Half Team ",
+    "# of Shots/Dogs": 5,
+    "WinnerScoreColor": "#94ba9b",
+    "LoserScoreColor": "#f4c7c4",
+    "ShotsDogsColor": "#f7d2d0"
+  },
+  {
+    "Week": 8,
+    "Winner Team": "The Barkley Brawlers ",
+    "Winner Score": 191.58,
+    "Loser Score": 106.68,
+    "Loser Team": "BBCU",
+    "# of Shots/Dogs": 5,
+    "WinnerScoreColor": "#227740",
+    "LoserScoreColor": "#f7d2d0",
+    "ShotsDogsColor": "#f7d2d0"
+  },
+  {
+    "Week": 9,
+    "Winner Team": "The Barkley Brawlers ",
+    "Winner Score": 93.6,
+    "Loser Score": 85.66,
+    "Loser Team": "Worst Management",
+    "# of Shots/Dogs": 6,
+    "WinnerScoreColor": "#eaa5a3",
+    "LoserScoreColor": "#e38f8d",
+    "ShotsDogsColor": "#df8482"
+  },
+  {
+    "Week": 10,
+    "Winner Team": "Uncle Rico Went Pro",
+    "Winner Score": 145.38,
+    "Loser Score": 107.3,
+    "Loser Team": "The Barkley Brawlers ",
+    "# of Shots/Dogs": 3,
+    "WinnerScoreColor": "#b7d1bb",
+    "LoserScoreColor": "#f7d2d0",
+    "ShotsDogsColor": "#7cab86"
+  },
+  {
+    "Week": 11,
+    "Winner Team": "WalterPickens",
+    "Winner Score": 160.94,
+    "Loser Score": 105.7,
+    "Loser Team": "Uncle Rico Went Pro",
+    "# of Shots/Dogs": 5,
+    "WinnerScoreColor": "#88b290",
+    "LoserScoreColor": "#f4c7c4",
+    "ShotsDogsColor": "#f7d2d0"
+  },
+  {
+    "Week": 12,
+    "Winner Team": "BBCU",
+    "Winner Score": 154.46,
+    "Loser Score": 135.68,
+    "Loser Team": "WalterPickens",
+    "# of Shots/Dogs": 2,
+    "WinnerScoreColor": "#94ba9b",
+    "LoserScoreColor": "#cfe0d2",
+    "ShotsDogsColor": "#227740"
+  },
+  {
+    "Week": 13,
+    "Winner Team": "Uncle Rico Went Pro",
+    "Winner Score": 125.16,
+    "Loser Score": 110.54,
+    "Loser Team": "BBCU",
+    "# of Shots/Dogs": 4,
+    "WinnerScoreColor": "#f3f7f3",
+    "LoserScoreColor": "#f9dddc",
+    "ShotsDogsColor": "#cfe0d2"
+  },
+  {
+    "Week": 14,
+    "Winner Team": "Uncle Rico Went Pro",
+    "Winner Score": 106.54,
+    "Loser Score": 104.44,
+    "Loser Team": "WalterPickens",
+    "# of Shots/Dogs": 5,
+    "WinnerScoreColor": "#f7d2d0",
+    "LoserScoreColor": "#f4c7c4",
+    "ShotsDogsColor": "#f7d2d0"
+  },
+  {
+    "Week": 15,
+    "Winner Team": "Uncle Rico Went Pro",
+    "Winner Score": 109.74,
+    "Loser Score": 99.4,
+    "Loser Team": "WalterPickens",
+    "# of Shots/Dogs": 5,
+    "WinnerScoreColor": "#f7d2d0",
+    "LoserScoreColor": "#f1bcb9",
+    "ShotsDogsColor": "#f7d2d0"
+  },
+  {
+    "Week": 16,
+    "Winner Team": "Uncle Rico Went Pro",
+    "Winner Score": 116.32,
+    "Loser Score": 104.3,
+    "Loser Team": "Worst Management",
+    "# of Shots/Dogs": 4,
+    "WinnerScoreColor": "#fbe8e7",
+    "LoserScoreColor": "#f4c7c4",
+    "ShotsDogsColor": "#cfe0d2"
+  },
+  {
+    "Week": 17,
+    "Winner Team": "The Barkley Brawlers ",
+    "Winner Score": 110.98,
+    "Loser Score": 102.16,
+    "Loser Team": "Uncle Rico Went Pro",
+    "# of Shots/Dogs": 5,
+    "WinnerScoreColor": "#f9dddc",
+    "LoserScoreColor": "#f1bcb9",
+    "ShotsDogsColor": "#f7d2d0"
+  }
+]

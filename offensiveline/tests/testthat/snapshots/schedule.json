@@ -1,0 +1,248 @@
+{
+  "best_records": [
+    {
+      "team1": "2nd Half Team ",
+      "team2_list": ["The Barkley Brawlers "],
+      "wins": 9,
+      "losses": 7,
+      "ties": 0
+    },
+    {
+      "team1": "BBCU",
+      "team2_list": ["Costco Guys"],
+      "wins": 15,
+      "losses": 1,
+      "ties": 0
+    },
+    {
+      "team1": "Bye Week Curious",
+      "team2_list": ["The Barkley Brawlers "],
+      "wins": 7,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "Costco Guys",
+      "team2_list": ["Worst Management"],
+      "wins": 10,
+      "losses": 6,
+      "ties": 0
+    },
+    {
+      "team1": "First Down Syndrome",
+      "team2_list": ["The Barkley Brawlers "],
+      "wins": 11,
+      "losses": 5,
+      "ties": 0
+    },
+    {
+      "team1": "Lord of the Littles",
+      "team2_list": ["Uncle Rico Went Pro", "Worst Management"],
+      "wins": 11,
+      "losses": 5,
+      "ties": 0
+    },
+    {
+      "team1": "Super Ja'Marrio Bros.",
+      "team2_list": ["The Barkley Brawlers "],
+      "wins": 12,
+      "losses": 5,
+      "ties": 0
+    },
+    {
+      "team1": "The Barkley Brawlers ",
+      "team2_list": ["The Barkley Brawlers "],
+      "wins": 12,
+      "losses": 5,
+      "ties": 0
+    },
+    {
+      "team1": "Uncle Rico Went Pro",
+      "team2_list": ["The Barkley Brawlers "],
+      "wins": 12,
+      "losses": 5,
+      "ties": 0
+    },
+    {
+      "team1": "WalterPickens",
+      "team2_list": ["Uncle Rico Went Pro"],
+      "wins": 11,
+      "losses": 5,
+      "ties": 0
+    },
+    {
+      "team1": "Worse Management",
+      "team2_list": ["The Barkley Brawlers ", "Worst Management"],
+      "wins": 7,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "Worst Management",
+      "team2_list": ["The Barkley Brawlers ", "Uncle Rico Went Pro"],
+      "wins": 12,
+      "losses": 4,
+      "ties": 0
+    }
+  ],
+  "worst_records": [
+    {
+      "team1": "2nd Half Team ",
+      "team2_list": ["BBCU"],
+      "wins": 4,
+      "losses": 11,
+      "ties": 0
+    },
+    {
+      "team1": "BBCU",
+      "team2_list": ["2nd Half Team ", "BBCU"],
+      "wins": 10,
+      "losses": 6,
+      "ties": 0
+    },
+    {
+      "team1": "Bye Week Curious",
+      "team2_list": ["BBCU", "WalterPickens"],
+      "wins": 1,
+      "losses": 15,
+      "ties": 0
+    },
+    {
+      "team1": "Costco Guys",
+      "team2_list": ["2nd Half Team "],
+      "wins": 5,
+      "losses": 11,
+      "ties": 0
+    },
+    {
+      "team1": "First Down Syndrome",
+      "team2_list": ["2nd Half Team ", "Bye Week Curious", "Worse Management"],
+      "wins": 5,
+      "losses": 11,
+      "ties": 0
+    },
+    {
+      "team1": "Lord of the Littles",
+      "team2_list": ["Bye Week Curious"],
+      "wins": 6,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "Super Ja'Marrio Bros.",
+      "team2_list": ["BBCU"],
+      "wins": 6,
+      "losses": 10,
+      "ties": 0
+    },
+    {
+      "team1": "The Barkley Brawlers ",
+      "team2_list": ["Super Ja'Marrio Bros.", "WalterPickens"],
+      "wins": 6,
+      "losses": 11,
+      "ties": 0
+    },
+    {
+      "team1": "Uncle Rico Went Pro",
+      "team2_list": ["2nd Half Team ", "BBCU"],
+      "wins": 7,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "WalterPickens",
+      "team2_list": ["2nd Half Team ", "Worse Management"],
+      "wins": 7,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "Worse Management",
+      "team2_list": ["2nd Half Team "],
+      "wins": 3,
+      "losses": 12,
+      "ties": 0
+    },
+    {
+      "team1": "Worst Management",
+      "team2_list": ["2nd Half Team "],
+      "wins": 8,
+      "losses": 7,
+      "ties": 0
+    }
+  ],
+  "current_records": [
+    {
+      "team1": "2nd Half Team ",
+      "wins": 7,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "BBCU",
+      "wins": 10,
+      "losses": 6,
+      "ties": 0
+    },
+    {
+      "team1": "Bye Week Curious",
+      "wins": 5,
+      "losses": 11,
+      "ties": 0
+    },
+    {
+      "team1": "Costco Guys",
+      "wins": 8,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "First Down Syndrome",
+      "wins": 7,
+      "losses": 9,
+      "ties": 0
+    },
+    {
+      "team1": "Lord of the Littles",
+      "wins": 9,
+      "losses": 7,
+      "ties": 0
+    },
+    {
+      "team1": "Super Ja'Marrio Bros.",
+      "wins": 7,
+      "losses": 10,
+      "ties": 0
+    },
+    {
+      "team1": "The Barkley Brawlers ",
+      "wins": 12,
+      "losses": 5,
+      "ties": 0
+    },
+    {
+      "team1": "Uncle Rico Went Pro",
+      "wins": 10,
+      "losses": 7,
+      "ties": 0
+    },
+    {
+      "team1": "WalterPickens",
+      "wins": 8,
+      "losses": 8,
+      "ties": 0
+    },
+    {
+      "team1": "Worse Management",
+      "wins": 5,
+      "losses": 11,
+      "ties": 0
+    },
+    {
+      "team1": "Worst Management",
+      "wins": 10,
+      "losses": 6,
+      "ties": 0
+    }
+  ]
+}
