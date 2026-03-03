@@ -1,3 +1,15 @@
+#' Build Awards JSON
+#'
+#' Computes best-ball lineups, creates the awards table, and returns the result
+#' as a JSON string.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param player_data player-level data from \code{get_all_matchups_data()}
+#' @param max_week the current week number
+#' @param team_photos team photo data from \code{get_team_photos()}
+#'
+#' @return a JSON string
+#' @export
 awards_to_json <- function(matchup_data,
                            player_data,
                            max_week,
@@ -6,13 +18,23 @@ awards_to_json <- function(matchup_data,
 
   best_ball_matchups <- create_best_ball_matchups(optimal_lineups = best_ball_lineups)
 
-  awards_data <- create_awards_table(player_data, matchup_data, best_ball_matchups, team_photos)
+  awards_data <- create_awards_table(player_data, matchup_data, best_ball_matchups, team_photos, max_week)
 
   json_data <- jsonlite::toJSON(awards_data, pretty = TRUE)
 
   return(json_data)
 }
 
+#' Build Efficiency JSON
+#'
+#' Computes best-ball vs actual points for the current week and returns as JSON.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param player_data player-level data from \code{get_all_matchups_data()}
+#' @param max_week the current week number
+#'
+#' @return a JSON string
+#' @export
 efficiency_to_json <- function(matchup_data, player_data, max_week) {
   best_ball_lineups <- calc_best_ball_lineups(player_data, max_week)
 
@@ -39,7 +61,17 @@ efficiency_to_json <- function(matchup_data, player_data, max_week) {
   return(json_data)
 }
 
-matchup_info_to_json <- function(matchup_data) {
+#' Build Matchup Info JSON
+#'
+#' Adds per-week statistics (average, median, max, min, margin of victory) and
+#' color scales to the matchup data, then returns as JSON.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param team_photos team photo data from \code{get_team_photos()}
+#'
+#' @return a JSON string
+#' @export
+matchup_info_to_json <- function(matchup_data, team_photos) {
   matchup_data <- matchup_data %>%
     group_by(week) %>%
     mutate(
@@ -98,6 +130,16 @@ matchup_info_to_json <- function(matchup_data) {
   return(json_data)
 }
 
+#' Build Matchup Plot JSON
+#'
+#' Extracts starter player data for the current week, grouped by team, and
+#' returns as a nested JSON string suitable for rendering a matchup stacked bar chart.
+#'
+#' @param player_data player-level data from \code{get_all_matchups_data()}
+#' @param max_week the current week number
+#'
+#' @return a JSON string
+#' @export
 matchup_plot_to_json <- function(player_data, max_week) {
   all_starters <- player_data[!is.na(player_data$starter_id), ]
   all_starters <- all_starters[all_starters$week == max_week, ]
@@ -120,7 +162,19 @@ matchup_plot_to_json <- function(player_data, max_week) {
   return(json_data)
 }
 
-# Function to generate color codes based on spec_color2
+#' Map Numeric Values to Hex Colors
+#'
+#' Scales a numeric vector to indices into \code{custom_palette36} and returns
+#' the corresponding hex color codes. Used internally to add \code{*_color}
+#' columns to JSON output data frames.
+#'
+#' @param x numeric vector to color-scale
+#' @param scale_from length-2 numeric vector giving the \code{c(min, max)} of
+#'   the input range to map from
+#' @param direction \code{1} for low=red/high=green; \code{-1} to reverse
+#'
+#' @return character vector of hex color codes, same length as \code{x}
+#' @noRd
 spec_color2_scale <- function(x, scale_from, direction = 1) {
   if (direction == -1) {
     scale_from <- rev(scale_from)
@@ -134,7 +188,18 @@ spec_color2_scale <- function(x, scale_from, direction = 1) {
   return(color_code)
 }
 
-motw_table_to_json <- function(motw_data) {
+#' Build MotW Table JSON
+#'
+#' Summarizes the Matchup of the Week results by week (winner, loser, scores,
+#' shots) and adds color-scale columns, returning as JSON.
+#'
+#' @param motw_data MotW-augmented matchup data from \code{add_motw_to_matchups()}
+#' @param all_matchups full team-level matchup data from \code{get_team_matchups()},
+#'   used to set the color scale range for scores
+#'
+#' @return a JSON string
+#' @export
+motw_table_to_json <- function(motw_data, all_matchups) {
   motw_table <- motw_data %>%
     filter(motw == 1) %>%
     group_by(week) %>%
@@ -184,6 +249,15 @@ motw_table_to_json <- function(motw_data) {
   return(json_data)
 }
 
+#' Build Shots Distribution JSON
+#'
+#' Returns shot counts for all losing teams (MotW and non-MotW) as JSON,
+#' for rendering a histogram.
+#'
+#' @param motw_data MotW-augmented matchup data from \code{add_motw_to_matchups()}
+#'
+#' @return a JSON string
+#' @export
 shots_dist_to_json <- function(motw_data) {
   # Filter data for losing teams
   losing_teams_data <- motw_data[motw_data$winner == 0, ]
@@ -198,6 +272,17 @@ shots_dist_to_json <- function(motw_data) {
   return(json_data)
 }
 
+#' Build Leaderboard JSON
+#'
+#' Creates the standings leaderboard with W-L-PF-PA-Trend and color columns,
+#' joins team photos, and returns as JSON.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number
+#' @param team_photos team photo data from \code{get_team_photos()}
+#'
+#' @return a JSON string
+#' @export
 leaderboard_to_json <- function(matchup_data, max_week, team_photos) {
   leaderboard_data <- create_leaderboard(matchup_data, max_week)
 
@@ -216,6 +301,17 @@ leaderboard_to_json <- function(matchup_data, max_week, team_photos) {
   return(json_data)
 }
 
+#' Build Power Rankings JSON
+#'
+#' Creates power rankings with team ability, strength of schedule, and color
+#' columns, returning as JSON.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number
+#' @param number_of_teams total number of teams in the league
+#'
+#' @return a JSON string
+#' @export
 power_rankings_to_json <- function(matchup_data, max_week, number_of_teams) {
   power_ranking_data <- create_power_rankings(matchup_data, max_week, number_of_teams)
 
@@ -242,6 +338,16 @@ power_rankings_to_json <- function(matchup_data, max_week, number_of_teams) {
   return(json_data)
 }
 
+#' Build Median Leaderboard JSON
+#'
+#' Creates the median-game leaderboard (each team plays a bonus game against
+#' the weekly median score) with color columns, returning as JSON.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number
+#'
+#' @return a JSON string
+#' @export
 median_lb_to_json <- function(matchup_data, max_week) {
   median_lb_data <- create_median_leaderboard(matchup_data, max_week)
 
@@ -258,6 +364,17 @@ median_lb_to_json <- function(matchup_data, max_week) {
   return(json_data)
 }
 
+#' Build Best-Ball Leaderboard JSON
+#'
+#' Creates the best-ball (optimal lineup) leaderboard with color columns and
+#' returns as JSON.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param player_data player-level data from \code{get_all_matchups_data()}
+#' @param max_week the current week number
+#'
+#' @return a JSON string
+#' @export
 best_ball_lb_to_json <- function(matchup_data, player_data, max_week) {
   best_ball_lineups <-
     calc_best_ball_lineups(player_data, max_week)
@@ -291,6 +408,17 @@ best_ball_lb_to_json <- function(matchup_data, player_data, max_week) {
   return(json_data)
 }
 
+#' Build Schedule Comparison JSON
+#'
+#' For every pair of teams, calculates the head-to-head record as if they had
+#' played each other every week (best record, worst record, actual record) and
+#' returns as a nested JSON string.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param team_photos team photo data from \code{get_team_photos()}
+#'
+#' @return a JSON string
+#' @export
 schedule_comparison_to_json <- function(matchup_data, team_photos) {
   matchup_data <- matchup_data %>%
     left_join(team_photos) %>%
@@ -409,6 +537,18 @@ schedule_comparison_to_json <- function(matchup_data, team_photos) {
   return(json_data)
 }
 
+#' Generate Output File Path for Newsletter JSON
+#'
+#' Constructs the path to the JSON output file inside the sibling
+#' \code{theoffensiveline-site} repository.
+#'
+#' @param base_path base directory prefix; defaults to the sibling site repo path
+#' @param current_year 2-digit year (e.g. \code{25} for 2025)
+#' @param current_week week number
+#' @param file_name JSON file name (e.g. \code{"leaderboard.json"})
+#'
+#' @return a character file path string
+#' @export
 generate_file_path <- function(base_path = "../theoffensiveline-site/src/newsletters/20",
                                current_year,
                                current_week,
@@ -416,7 +556,16 @@ generate_file_path <- function(base_path = "../theoffensiveline-site/src/newslet
   paste0(base_path, current_year, "/20", current_year, " Week ", current_week, "/", file_name)
 }
 
-# Define a function to write JSON data to a file
+#' Write JSON Data to a File
+#'
+#' Writes a JSON string to the specified file path and prints a confirmation
+#' message.
+#'
+#' @param json_data a JSON string (e.g. from \code{jsonlite::toJSON()})
+#' @param file_path destination file path
+#'
+#' @return invisibly returns \code{NULL}; called for its side effect
+#' @export
 write_json_to_file <- function(json_data, file_path) {
   writeLines(json_data, file_path)
   cat("Data has been successfully written to", file_path, "\n")

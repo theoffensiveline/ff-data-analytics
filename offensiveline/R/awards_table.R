@@ -90,11 +90,27 @@ top_player_award <- function(pos, data, current_week, award_name) {
   return(awards)
 }
 
+#' Create the Full Awards Table for a Given Week
+#'
+#' Computes all weekly awards (Best/Worst Manager, Worst Winner, Best Loser,
+#' Deadest Horse, Photo Finish, Warmest Bench, Heaviest Top, MVP, Bench MVP,
+#' and position awards) and returns them as a data frame.
+#'
+#' @param player_data player-level data from \code{get_all_matchups_data()}
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param best_ball_matchups optimal lineup matchup data from \code{create_best_ball_matchups()}
+#' @param team_photos team photo data from \code{get_team_photos()}
+#' @param current_week the week number to compute awards for
+#'
+#' @return a data frame with columns \code{award}, \code{photo}, \code{name},
+#'   \code{value}, \code{description}; one row per award (ties produce multiple rows)
+#' @export
 create_awards_table <-
   function(player_data,
            matchup_data,
            best_ball_matchups,
-           team_photos) {
+           team_photos,
+           current_week) {
     ##### Awards Table #####
     ###### Best and Worst Managers ######
     # find the best manager and points scored

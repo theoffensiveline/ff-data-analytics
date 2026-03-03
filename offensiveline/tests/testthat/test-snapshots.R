@@ -21,14 +21,6 @@ motw_data    <- readRDS(test_path("fixtures", "motw_full.rds"))
 team_photos  <- readRDS(test_path("fixtures", "team_photos.rds"))
 max_week     <- 17L
 
-# Two package functions reference globals leaked from main.R's calling environment:
-#   - create_awards_table()  uses `current_week` (awards_table.R:103)
-#   - motw_table_to_json()   uses `all_matchups`  (stuff_to_json.R:157)
-# Assign them to .GlobalEnv so package functions can find them during tests.
-# Phase 5 will fix these functions to accept the values as parameters instead.
-assign("current_week", max_week,     envir = .GlobalEnv)
-assign("all_matchups", all_matchups, envir = .GlobalEnv)
-
 # ── main.R outputs ────────────────────────────────────────────────────────────
 
 test_that("leaderboard_to_json matches golden", {
@@ -47,7 +39,7 @@ test_that("awards_to_json matches golden", {
 
 test_that("motw_table_to_json matches golden", {
   compare_to_golden(
-    motw_table_to_json(motw_data),
+    motw_table_to_json(motw_data, all_matchups),
     "motw_table.json"
   )
 })

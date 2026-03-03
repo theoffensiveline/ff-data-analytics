@@ -1,14 +1,15 @@
-#' Title Scoring Distribution Chart
+#' Plot Team Scoring Distribution
 #'
-#' @param matchup_data output from get_team_matchups
-#' @param max_week maximum week in chart
-#' @param color_1
-#' @param color_2
+#' Histogram of all team scores through \code{max_week}, with the current week
+#' highlighted as a separate fill colour.
 #'
-#' @return
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number
+#' @param color_1 fill colour for the current week bars
+#' @param color_2 fill colour for historic bars
+#'
+#' @return a ggplot2 object
 #' @export
-#'
-#' @examples
 create_scoring_dist <-
   function(matchup_data, max_week, color_1, color_2) {
     matchup_data$Group <-
@@ -45,6 +46,16 @@ create_scoring_dist <-
   }
 
 
+#' Plot Weekly Scoring Trends
+#'
+#' Line chart showing average, median, maximum, and minimum team scores by week,
+#' with individual team scores as points.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number
+#'
+#' @return a ggplot2 object
+#' @export
 create_weekly_scoring_chart <- function(matchup_data, max_week) {
   stats_df <- matchup_data %>% group_by(week) %>%
     dplyr::summarize(
@@ -54,9 +65,9 @@ create_weekly_scoring_chart <- function(matchup_data, max_week) {
       'Minimum' = min(team_points),
     )
 
-  stats_df <- melt(stats_df, "week")
+  stats_df <- reshape2::melt(stats_df, "week")
 
-  stats_df$value <- round(stats_df$value , digit = 2)
+  stats_df$value <- round(stats_df$value, digit = 2)
 
   stats_df$variable <-
     factor(stats_df$variable,
@@ -88,6 +99,17 @@ create_weekly_scoring_chart <- function(matchup_data, max_week) {
   return(weekly_scoring_plot)
 }
 
+#' Plot a Single Matchup as a Stacked Bar Chart
+#'
+#' Shows each starter's points stacked by position for both teams in a given
+#' matchup, ordered by total team score.
+#'
+#' @param player_data player-level data from \code{get_all_matchups_data()}
+#' @param matchup_id the matchup identifier to plot
+#' @param week the week number to plot
+#'
+#' @return a ggplot2 object
+#' @export
 create_matchup_plot <- function(player_data, matchup_id, week) {
   matchup <- player_data[!is.na(player_data$starter_id) &
                            player_data$matchup_id == matchup_id &
@@ -150,6 +172,18 @@ create_matchup_plot <- function(player_data, matchup_id, week) {
 }
 
 
+#' Plot Best-Ball Efficiency for a Given Week
+#'
+#' Horizontal bar chart comparing each team's actual score vs. their optimal
+#' (best-ball) score, with efficiency percentage labelled.
+#'
+#' @param best_ball_matchups optimal lineup matchup data from
+#'   \code{create_best_ball_matchups()}
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number
+#'
+#' @return a ggplot2 object
+#' @export
 create_efficiency_plot <-
   function(best_ball_matchups,
            matchup_data,
@@ -183,15 +217,13 @@ create_efficiency_plot <-
       geom_text(
         aes(x = team_name.x, y = 1, label = team_name.x),
         hjust = 'left',
-        # Align the label to the left
         vjust = 'middle',
         color = '#2E2E2E',
-        # Center the label vertically
-        size = 4        # Adjust the size of labels if needed
+        size = 4
       ) +
       geom_text(aes(y = team_points.x, label = paste0(round(percentage, 2), "%")),
                 hjust = -0.1,
-                size = 3)  +    # Adjust the size of labels if needed)
+                size = 3) +
       scale_y_continuous(breaks = seq(0,
                                       plyr::round_any(
                                         max(chart_data$team_points.x), 5, ceiling
@@ -209,6 +241,7 @@ create_efficiency_plot <-
     return(final_chart)
   }
 
+# Position color palette used across matchup plots
 colorsByPosition <- c(
   QB = '#E1676F',
   RB = '#11D677',
@@ -218,6 +251,7 @@ colorsByPosition <- c(
   DEF = '#65645A'
 )
 
+# 12-step red-to-green palette
 custom_palette12 <-
   c(
     "#bc293d",
@@ -234,6 +268,7 @@ custom_palette12 <-
     "#227740"
   )
 
+# 36-step red-to-green palette used for color-scaling JSON output columns
 custom_palette36 <-
   c(
     "#bc293d",
@@ -275,6 +310,7 @@ custom_palette36 <-
   )
 
 
+#' @noRd
 spec_color2 <- function(x,
                         alpha = 1,
                         begin = 0,
@@ -303,6 +339,18 @@ spec_color2 <- function(x,
 }
 
 
+#' Plot the MotW Shots Distribution
+#'
+#' Stacked bar chart of how many potential shots losing teams would take each
+#' week, split by whether they were in a MotW game.
+#'
+#' @param motw_data MotW-augmented matchup data from \code{add_motw_to_matchups()}
+#' @param max_week the current week number
+#' @param color_1 fill colour for MotW losers
+#' @param color_2 fill colour for non-MotW losers
+#'
+#' @return a ggplot2 object
+#' @export
 create_shots_dist <-
   function(motw_data, max_week, color_1, color_2) {
     motw_data$Group <-
@@ -324,6 +372,16 @@ create_shots_dist <-
     return(shots_dist)
   }
 
+#' Plot Points For vs Points Against Scatter
+#'
+#' Scatter plot showing each team's total PF vs PA with team logos (or name
+#' labels as fallback), and quadrant annotations for luck/skill.
+#'
+#' @param leaderboard leaderboard data frame from \code{create_leaderboard()}
+#' @param team_photos team photo data from \code{get_team_photos()}
+#'
+#' @return a ggplot2 object
+#' @export
 create_PF_PA_scatter <- function(leaderboard, team_photos) {
   df <-
     leaderboard %>% left_join(team_photos, by = c("Team" = "team_name"))
@@ -332,7 +390,7 @@ create_PF_PA_scatter <- function(leaderboard, team_photos) {
     geom_abline(slope = 1,
                 intercept = 0,
                 linetype = 'dotted') +
-    geom_image(data = subset(df,!is.na(avatar)),
+    geom_image(data = subset(df, !is.na(avatar)),
                aes(image = avatar),
                size = 0.1) +
     geom_text(data = subset(df, is.na(avatar)), aes(label = Team)) +
@@ -399,6 +457,16 @@ create_PF_PA_scatter <- function(leaderboard, team_photos) {
   return(scatterplot)
 }
 
+#' Plot Weekly Team Rankings
+#'
+#' Bump chart showing each team's weekly rank (by points scored), with team
+#' logos or name labels at each point and W/L indicators.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param team_photos team photo data from \code{get_team_photos()}
+#'
+#' @return a ggplot2 object
+#' @export
 create_rank_chart <- function(matchup_data, team_photos) {
   df <- matchup_data %>%
     arrange(week, team_points) %>%
@@ -410,13 +478,11 @@ create_rank_chart <- function(matchup_data, team_photos) {
     factor(df$rank, levels = rev(unique(df$rank)))
 
   weekly_rank_plot <- ggplot(df, aes(x = week, y = rank)) +
-    #geom_line(aes(group = team_name), linewidth = 0.5) +
     geom_image(data = subset(df, !is.na(avatar)),
                aes(image = avatar),
                size = 0.09) +
     geom_text(
       data = subset(df, winner == 1),
-      # Add green tiles for winner == 1
       aes(x = week, y = rank, label = 'W'),
       color = "#227740",
       size = 4,
@@ -424,7 +490,6 @@ create_rank_chart <- function(matchup_data, team_photos) {
     ) +
     geom_text(
       data = subset(df, winner == 0),
-      # Add red tiles for winner == 0
       aes(x = week, y = rank, label = 'L'),
       color = "#bc293d",
       size = 4,

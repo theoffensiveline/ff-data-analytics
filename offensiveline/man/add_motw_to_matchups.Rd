@@ -2,20 +2,27 @@
 % Please edit documentation in R/motw.R
 \name{add_motw_to_matchups}
 \alias{add_motw_to_matchups}
-\title{Title Matchup of the Week}
+\title{Add Matchup of the Week Flags to Matchup Data}
 \usage{
-add_motw_to_matchups(matchup_data, week_1_matchup_id, max_week)
+add_motw_to_matchups(matchup_data, week_1_matchup_id, max_week, player_data)
 }
 \arguments{
-\item{matchup_data}{matchup data from sleeper}
+\item{matchup_data}{team-level matchup data from \code{get_team_matchups()}}
 
-\item{week_1_matchup_id}{matchup id for the MotW for week 1}
+\item{week_1_matchup_id}{the \code{matchup_id} of the designated week-1 MotW game}
 
-\item{max_week}{the final week to calculate MotW for}
+\item{max_week}{the final week to calculate MotW through (inclusive)}
+
+\item{player_data}{player-level data from \code{get_all_matchups_data()},
+used to compute shot counts}
+}
+\value{
+\code{matchup_data} with added columns \code{motw} (1 = MotW game,
+  NA otherwise) and \code{# of Shots}
 }
 \description{
-Title Matchup of the Week
-}
-\examples{
-add_motw_to_matchups(matchup_data = all_matchups, week_1_matchup_id = 1, max_week = current_week)
+Seeds the initial MotW matchup in week 1, then chains forward each week so
+the prior week's MotW winner faces a new opponent. Also computes the number
+of shots each losing team would take (starters who scored <10 pts, with an
+extra shot for any starter scoring negative).
 }

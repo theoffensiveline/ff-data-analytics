@@ -89,7 +89,7 @@ leaderboard_file_path <- generate_file_path(
 write_json_to_file(leaderboard_json, leaderboard_file_path)
 
 # matchupData.json
-matchup_info_json <- matchup_info_to_json(all_matchups)
+matchup_info_json <- matchup_info_to_json(all_matchups, team_photos)
 matchup_info_file_path <- generate_file_path(  
   current_year = current_year, 
   current_week = current_week, 
@@ -105,7 +105,7 @@ median_lb_file_path <- generate_file_path(
 write_json_to_file(median_lb_json, median_lb_file_path)
 
 # motwTable.json
-motw_json <- motw_table_to_json(motw_data)
+motw_json <- motw_table_to_json(motw_data, all_matchups)
 motw_file_path <- generate_file_path(
   current_year = current_year, 
   current_week = current_week,

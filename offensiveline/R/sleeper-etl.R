@@ -250,6 +250,17 @@ get_team_matchups <- function(player_data) {
   return(data)
 }
 
+#' Get Team Photo URLs for a League
+#'
+#' Fetches user information from Sleeper and returns each team's name alongside
+#' their avatar upload URL (or the team name as a text fallback if no avatar
+#' is set).
+#'
+#' @param league_id Sleeper league id to get data from
+#'
+#' @return a data frame with columns \code{team_name}, \code{avatar_upload},
+#'   and \code{image_or_text} (avatar URL or team name)
+#' @export
 get_team_photos <- function(league_id) {
   # get user info for the league
   users <- get_league_users(league_id)
@@ -269,6 +280,17 @@ get_team_photos <- function(league_id) {
   return(filtered_users)
 }
 
+#' Get Transactions for a Sleeper League Round
+#'
+#' Queries the Sleeper API for all transactions (adds, drops, trades) in a
+#' given week/round of a league.
+#'
+#' @param league_id Sleeper league id to get data from
+#' @param round the week/round number to retrieve transactions for (numeric)
+#'
+#' @return a data frame of transactions for the given round, or nothing if no
+#'   data is found
+#' @export
 get_transactions_sleeper <- function(league_id, round) {
   # Check if class of round parameter is numeric
   if (!is.numeric(round)) {
@@ -294,6 +316,20 @@ get_transactions_sleeper <- function(league_id, round) {
   }
 }
 
+#' Get All Transaction Data Through the Current Week
+#'
+#' Loops through weeks 1 to \code{max_week}, calling
+#' \code{get_transactions_sleeper()} for each, and combines the results into a
+#' single data frame. Each row represents one player add or drop, or one side
+#' of a FAAB trade.
+#'
+#' @param league_id Sleeper league id to get data from
+#' @param max_week the most recent week to retrieve transactions through
+#'
+#' @return a data frame with columns \code{week}, \code{trans_id},
+#'   \code{player_id}, \code{manager_id}, \code{type}, \code{status},
+#'   \code{add_drop}, and \code{waiver_bid}
+#' @export
 get_all_transaction_data <- function(league_id, max_week) {
   all_data_list <- list()  # Initialize an empty list to store data
 

@@ -1,13 +1,25 @@
+#' Calculate Optimal (Best-Ball) Lineups
+#'
+#' For each team and week, determines the highest-scoring valid lineup by
+#' assigning players to slots (QB, RB x2, WR x2, TE, FLEX W/R/T, DEF, K) that
+#' maximize total points.
+#'
+#' @param player_data player-level data from \code{get_all_matchups_data()}
+#' @param max_week the current week number (only weeks up to this are used)
+#'
+#' @return the input \code{player_data} with an added \code{optimal_slot} column
+#'   (\code{"BENCH"} for players not in the optimal lineup)
+#' @export
 calc_best_ball_lineups <- function(player_data, max_week) {
   # create dict of all slots that different positions can play in
   possible_slots <-
-    tibble(
+    tibble::tibble(
       position = c("QB", "RB", "RB", "WR", "WR", "TE", "TE", "DEF", "K"),
       possible_slot = c("QB", "RB", "W/R/T", "WR", "W/R/T", "TE", "W/R/T", "DEF", "K")
     )
   # create dict of how many players can play in each slot
   slot_counts <-
-    tibble(
+    tibble::tibble(
       possible_slot = c("QB", "RB", "WR", "TE", "DEF", "K"),
       n_slots = c(1, 2, 2, 1, 1, 1)
     )
@@ -52,9 +64,20 @@ calc_best_ball_lineups <- function(player_data, max_week) {
     #Anyone without an optimal slot should be benched
     mutate(optimal_slot = coalesce(optimal_slot, "BENCH"))
 
-  return (optimal_lineups)
+  return(optimal_lineups)
 }
 
+#' Aggregate Optimal Lineups to Matchup Level
+#'
+#' Sums each team's optimal starter points per week and recomputes winners based
+#' on best-ball scores.
+#'
+#' @param optimal_lineups result of \code{calc_best_ball_lineups()}
+#'
+#' @return a data frame with columns \code{week}, \code{manager_id},
+#'   \code{team_name}, \code{winner}, \code{matchup_id}, \code{team_points}
+#'   (optimal total)
+#' @export
 create_best_ball_matchups <-
   function(optimal_lineups) {
     matchups <- optimal_lineups %>%
@@ -72,6 +95,18 @@ create_best_ball_matchups <-
     return(matchups)
   }
 
+#' Calculate Points Left on the Bench
+#'
+#' Computes the difference between each team's optimal (best-ball) score and
+#' their actual score, and ranks teams by how many points they left on the bench.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param optimal_lineups result of \code{calc_best_ball_lineups()}
+#'
+#' @return a data frame with columns from \code{matchup_data} plus
+#'   \code{points_on_bench}, \code{most_bench_pts_rank},
+#'   \code{least_bench_pts_rank}
+#' @export
 calc_bench_points <- function(matchup_data, optimal_lineups) {
   best_ball_matchups <- create_best_ball_matchups(optimal_lineups)
 
@@ -79,7 +114,7 @@ calc_bench_points <- function(matchup_data, optimal_lineups) {
     left_join(best_ball_matchups,
               by = c('week', 'manager_id', 'team_name', 'matchup_id')) %>%
     mutate(points_on_bench = team_points.y - team_points.x) %>%
-    select(-team_points.x,-team_points.y,-winner.x,-winner.y) %>%
+    select(-team_points.x, -team_points.y, -winner.x, -winner.y) %>%
     mutate(
       most_bench_pts_rank = rank(-points_on_bench, ties.method = "min"),
       least_bench_pts_rank = rank(points_on_bench, ties.method = "min")

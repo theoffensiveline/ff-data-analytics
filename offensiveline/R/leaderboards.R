@@ -1,3 +1,15 @@
+#' Create the Weekly Standings Leaderboard
+#'
+#' Builds a standings table through \code{max_week} with columns for rank,
+#' trend (vs prior week), team name, wins, losses, points for, and points
+#' against.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number (inclusive)
+#'
+#' @return a data frame with columns \code{Rank}, \code{Trend}, \code{Team},
+#'   \code{W}, \code{L}, \code{PF}, \code{PA}
+#' @export
 create_leaderboard <- function(matchup_data, max_week) {
   # create last week leaderboard
   last_week_leaderboard <- matchup_data %>%
@@ -47,6 +59,19 @@ create_leaderboard <- function(matchup_data, max_week) {
 }
 
 
+#' Create Power Rankings
+#'
+#' Ranks teams by a weighted play-all record (recent weeks weighted higher)
+#' combined with strength of schedule. Returns rank, trend vs prior week, and
+#' the underlying metrics.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number (inclusive)
+#' @param number_of_teams total number of teams in the league
+#'
+#' @return a data frame with columns \code{P Rank}, \code{Trend}, \code{Team},
+#'   \code{Play All W}, \code{Play All L}, \code{Team Ability}, \code{Str of Sched}
+#' @export
 create_power_rankings <-
   function(matchup_data, max_week, number_of_teams) {
     # create last week power_rankings
@@ -143,6 +168,18 @@ create_power_rankings <-
     return(power_rankings)
   }
 
+#' Create the Median-Game Leaderboard
+#'
+#' Each week, every team earns a bonus win or loss based on whether their score
+#' beats the weekly median. Returns standings under this double-game format with
+#' a rank comparison against the standard leaderboard.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param max_week the current week number (inclusive)
+#'
+#' @return a data frame with columns \code{Rank}, \code{Diff} (vs standard
+#'   leaderboard rank), \code{Team}, \code{W}, \code{L}, \code{PF}, \code{PA}
+#' @export
 create_median_leaderboard <- function(matchup_data, max_week) {
   # get current leaderboard
   leaderboard <- create_leaderboard(matchup_data, max_week)
@@ -180,6 +217,20 @@ create_median_leaderboard <- function(matchup_data, max_week) {
   return(median_leaderboard)
 }
 
+#' Create the Best-Ball Leaderboard
+#'
+#' Replaces each team's actual score with their optimal lineup score for every
+#' week, then re-computes standings. Returns a rank comparison against the
+#' standard leaderboard.
+#'
+#' @param matchup_data team-level matchup data from \code{get_team_matchups()}
+#' @param best_ball_matchup_data optimal lineup matchup data from
+#'   \code{create_best_ball_matchups()}
+#' @param max_week the current week number (inclusive)
+#'
+#' @return a data frame with columns \code{Rank}, \code{Diff} (vs standard
+#'   leaderboard rank), \code{Team}, \code{W}, \code{L}, \code{PF}, \code{PA}
+#' @export
 create_best_ball_leaderboard <- function(matchup_data, best_ball_matchup_data, max_week) {
   # get current leaderboard
   leaderboard <- create_leaderboard(matchup_data, max_week)
