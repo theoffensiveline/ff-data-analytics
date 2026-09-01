@@ -96,8 +96,8 @@ def add_division_matchups(rounds: List[List[Tuple[str, str]]]) -> List[List[Tupl
     """
     # Define the divisions
     division1 = ["Kyle", "Trevor", "Josh K", "Anthony"]
-    division2 = ["Matt Rob", "Smitty", "Jake", "Josh L"]
-    division3 = ["Devan", "Nikhil", "Greg", "Alec"]
+    division2 = ["Will", "Smitty", "Jake", "Josh L"]
+    division3 = ["Matt Rob", "Nikhil", "Greg", "Alec"]
     
     # Create division matchups - each player plays one game against each division opponent
     division_matchups = []
@@ -182,7 +182,7 @@ def main():
         "Trevor", 
         "Nikhil", 
         "Jake", 
-        "Devan", 
+        "Will", 
         "Kyle"
     ]
     
