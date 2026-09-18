@@ -19,11 +19,11 @@ library(rcartocolor)
 
 # Define the league ID, sleeper players file, and get NFL state
 # league_id <- 1223730601350135814 # Walter league
-league_id <- 1253779168802377728 # main league
+league_id <- 1382521746292219904 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 17 #NFL_state$display_week
-current_year <- 25
+current_week <- 1 #NFL_state$display_week
+current_year <- 26
 
 # team photos
 team_photos <- get_team_photos(league_id)
@@ -52,113 +52,113 @@ motw_data <- add_motw_to_matchups(
 
 ##### data outputs #####
 
-# awardsTable.json
-awards_json <- awards_to_json(all_matchups, all_players, current_week, team_photos)
-awards_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week, 
-  file_name = "awardsTable.json"
-)
-write_json_to_file(awards_json, awards_file_path)
-
-# bestBallLb.json
-best_ball_json <- best_ball_lb_to_json(all_matchups, all_players, current_week)
-best_ball_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week, 
-  file_name = "bestBallLb.json"
-)
-write_json_to_file(best_ball_json, best_ball_file_path)
-
-# efficiencyData.json
-efficiency_json <- efficiency_to_json(all_matchups, all_players, current_week)
-efficiency_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week, 
-  file_name = "efficiencyData.json"
-)
-write_json_to_file(efficiency_json, efficiency_file_path)
-
-# leaderboard.json
-leaderboard_json <- leaderboard_to_json(all_matchups, current_week, team_photos)
-leaderboard_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week, 
-  file_name = "leaderboard.json"
-)
-write_json_to_file(leaderboard_json, leaderboard_file_path)
-
-# matchupData.json
-matchup_info_json <- matchup_info_to_json(all_matchups, team_photos)
-matchup_info_file_path <- generate_file_path(  
-  current_year = current_year, 
-  current_week = current_week, 
-  file_name = "matchupData.json")
-write_json_to_file(matchup_info_json, matchup_info_file_path)
-
-# medianLb.json
-median_lb_json <- median_lb_to_json(all_matchups, current_week)
-median_lb_file_path <- generate_file_path(  
-  current_year = current_year, 
-  current_week = current_week, 
-  file_name = "medianLb.json")
-write_json_to_file(median_lb_json, median_lb_file_path)
-
-# motwTable.json
-motw_json <- motw_table_to_json(motw_data, all_matchups)
-motw_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week,
-  file_name = "motwTable.json"
-)
-write_json_to_file(motw_json, motw_file_path)
-
-# playoffTable.json
-# run new_site_stuff.R first to get playoff_output
-playoff_table_json <- jsonlite::toJSON(playoff_output, pretty = TRUE)
-playoff_table_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week,
-  file_name = "playoffTable.json"
-)
-write_json_to_file(playoff_table_json, playoff_table_file_path)
-
-
-# powerRankings.json
-power_rankings_json <- power_rankings_to_json(all_matchups, current_week, 12)
-power_rankings_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week,
-  file_name = "powerRankings.json"
-)
-write_json_to_file(power_rankings_json, power_rankings_file_path)
-
-# scheduleData.json
-schedule_json <- schedule_comparison_to_json(all_matchups, team_photos)
-schedule_file_path  <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week,
-  file_name = "scheduleData.json"
-)
-write_json_to_file(schedule_json, schedule_file_path)
-
-# shotsDist.json
-shots_json <- shots_dist_to_json(motw_data)
-shots_file_path  <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week,
-  file_name = "shotsDist.json"
-)
-write_json_to_file(shots_json, shots_file_path)
-
-# starters.json
-starters_json <- matchup_plot_to_json(all_players, current_week)
-starters_file_path <- generate_file_path(
-  current_year = current_year, 
-  current_week = current_week,
-  file_name = "starters.json"
-)
-write_json_to_file(starters_json, starters_file_path)
+# # awardsTable.json
+# awards_json <- awards_to_json(all_matchups, all_players, current_week, team_photos)
+# awards_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week, 
+#   file_name = "awardsTable.json"
+# )
+# write_json_to_file(awards_json, awards_file_path)
+# 
+# # bestBallLb.json
+# best_ball_json <- best_ball_lb_to_json(all_matchups, all_players, current_week)
+# best_ball_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week, 
+#   file_name = "bestBallLb.json"
+# )
+# write_json_to_file(best_ball_json, best_ball_file_path)
+# 
+# # efficiencyData.json
+# efficiency_json <- efficiency_to_json(all_matchups, all_players, current_week)
+# efficiency_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week, 
+#   file_name = "efficiencyData.json"
+# )
+# write_json_to_file(efficiency_json, efficiency_file_path)
+# 
+# # leaderboard.json
+# leaderboard_json <- leaderboard_to_json(all_matchups, current_week, team_photos)
+# leaderboard_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week, 
+#   file_name = "leaderboard.json"
+# )
+# write_json_to_file(leaderboard_json, leaderboard_file_path)
+# 
+# # matchupData.json
+# matchup_info_json <- matchup_info_to_json(all_matchups, team_photos)
+# matchup_info_file_path <- generate_file_path(  
+#   current_year = current_year, 
+#   current_week = current_week, 
+#   file_name = "matchupData.json")
+# write_json_to_file(matchup_info_json, matchup_info_file_path)
+# 
+# # medianLb.json
+# median_lb_json <- median_lb_to_json(all_matchups, current_week)
+# median_lb_file_path <- generate_file_path(  
+#   current_year = current_year, 
+#   current_week = current_week, 
+#   file_name = "medianLb.json")
+# write_json_to_file(median_lb_json, median_lb_file_path)
+# 
+# # motwTable.json
+# motw_json <- motw_table_to_json(motw_data, all_matchups)
+# motw_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week,
+#   file_name = "motwTable.json"
+# )
+# write_json_to_file(motw_json, motw_file_path)
+# 
+# # playoffTable.json
+# # run new_site_stuff.R first to get playoff_output
+# playoff_table_json <- jsonlite::toJSON(playoff_output, pretty = TRUE)
+# playoff_table_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week,
+#   file_name = "playoffTable.json"
+# )
+# write_json_to_file(playoff_table_json, playoff_table_file_path)
+# 
+# 
+# # powerRankings.json
+# power_rankings_json <- power_rankings_to_json(all_matchups, current_week, 12)
+# power_rankings_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week,
+#   file_name = "powerRankings.json"
+# )
+# write_json_to_file(power_rankings_json, power_rankings_file_path)
+# 
+# # scheduleData.json
+# schedule_json <- schedule_comparison_to_json(all_matchups, team_photos)
+# schedule_file_path  <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week,
+#   file_name = "scheduleData.json"
+# )
+# write_json_to_file(schedule_json, schedule_file_path)
+# 
+# # shotsDist.json
+# shots_json <- shots_dist_to_json(motw_data)
+# shots_file_path  <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week,
+#   file_name = "shotsDist.json"
+# )
+# write_json_to_file(shots_json, shots_file_path)
+# 
+# # starters.json
+# starters_json <- matchup_plot_to_json(all_players, current_week)
+# starters_file_path <- generate_file_path(
+#   current_year = current_year, 
+#   current_week = current_week,
+#   file_name = "starters.json"
+# )
+# write_json_to_file(starters_json, starters_file_path)
 
 # # create weekly scoring chart
 # weekly_scores <-
@@ -248,7 +248,7 @@ motw_schedule_output <-
 motw_schedule_output
 
 write_csv(motw_schedule_output,
-          "currentMotW/schedule25.csv",
+          "currentMotW/schedule26.csv",
           col_names = FALSE)
 
 # run python script for MotW data - don't forget to edit first
@@ -282,6 +282,21 @@ danger_table_file_path <- generate_file_path(
   file_name = "dangerTable.json"
 )
 write_json_to_file(danger_table_json, danger_table_file_path)
+
+# dangerTable.png
+danger_table_image_path <- generate_file_path(
+  current_year = current_year,
+  current_week = current_week,
+  file_name = "dangerTable.png"
+)
+ggsave(
+  danger_table_image_path,
+  create_danger_table_plot(danger_table),
+  width = 4.5,
+  height = 8,
+  dpi = 300,
+  bg = "white"
+)
 
 # ##### need to clean up #####
 # 

@@ -3,11 +3,11 @@ import graphviz
 import uuid
 
 import os
-os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
+os.environ["PATH"] += os.pathsep + '/opt/homebrew/bin'
 
-CURRENT_YEAR = 25
-CURRENT_WEEK = 14
-CURRENT_CHAMPION = "Uncle Rico Went Pro"
+CURRENT_YEAR = 26
+CURRENT_WEEK = 2
+CURRENT_CHAMPION = "Free DevDawg3 & J. Jacobs"
 matchups = [['Week', 'Champion', 'Opponent']]
 
 
@@ -44,7 +44,7 @@ def build(name, week, last_week, schedule, dot, my_uuid):
 
 def make_schedule_map():
     schedule = dict()
-    with open('currentMotW/schedule25.csv', newline='') as csvfile:
+    with open('currentMotW/schedule26.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             week = int(row[0])

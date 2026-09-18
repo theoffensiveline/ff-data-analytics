@@ -252,3 +252,116 @@ create_danger_chart <- function() {
 
   return(week_plot)
 }
+
+#' Render the MotW Danger Table as a ggplot Image
+#'
+#' Draws \code{danger_table} as a static, portrait (mobile-shaped) table
+#' graphic suitable for saving as a PNG. Any \code{<col>_color} columns (as
+#' appended in \code{main.R}) are used as cell backgrounds so the image
+#' matches the JSON table on the site.
+#'
+#' @param danger_table output of \code{create_danger_table()}, optionally with
+#'   \code{*_color} hex columns appended
+#'
+#' @return a ggplot2 object
+#' @export
+create_danger_table_plot <- function(danger_table) {
+  data_cols <- setdiff(names(danger_table),
+                       grep("_color$", names(danger_table), value = TRUE))
+  n_rows <- nrow(danger_table)
+  header_h <- 1.6
+
+  # Team column gets extra width; metric columns stay narrow
+  col_widths <- ifelse(data_cols == "Team", 2.6, 1)
+  x_right <- cumsum(col_widths)
+  x_left <- x_right - col_widths
+  x_mid <- (x_left + x_right) / 2
+
+  cell_data <- do.call(
+    rbind,
+    lapply(seq_along(data_cols), function(j) {
+      col <- data_cols[j]
+      color_col <- paste0(col, "_color")
+      fill <- if (color_col %in% names(danger_table)) {
+        danger_table[[color_col]]
+      } else {
+        rep("#FFFFFF", n_rows)
+      }
+      lum <- colSums(col2rgb(fill) * c(0.299, 0.587, 0.114)) / 255
+      data.frame(
+        x_mid = x_mid[j],
+        xmin = x_left[j],
+        xmax = x_right[j],
+        y = n_rows:1,
+        label = as.character(danger_table[[col]]),
+        fill = fill,
+        text_color = ifelse(lum > 0.6, "black", "white"),
+        is_team = col == "Team",
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+
+  cell_data$label[cell_data$is_team] <- vapply(
+    cell_data$label[cell_data$is_team],
+    function(s) paste(strwrap(s, width = 18), collapse = "\n"),
+    character(1)
+  )
+
+  header_labels <- vapply(
+    data_cols,
+    function(col) {
+      if (grepl(" Win DM$", col)) {
+        name <- sub(" Win DM$", "", col)
+        paste0(paste(strwrap(name, width = 10), collapse = "\n"), "\nWin DM")
+      } else {
+        col
+      }
+    },
+    character(1)
+  )
+
+  header_data <- data.frame(
+    xmin = x_left,
+    xmax = x_right,
+    x_mid = x_mid,
+    ymin = n_rows + 0.5,
+    ymax = n_rows + 0.5 + header_h,
+    label = header_labels
+  )
+
+  ggplot(cell_data) +
+    geom_rect(
+      aes(xmin = xmin, xmax = xmax, ymin = y - 0.5, ymax = y + 0.5,
+          fill = fill),
+      colour = "white",
+      linewidth = 0.4
+    ) +
+    geom_text(
+      aes(x = x_mid, y = y, label = label, colour = text_color),
+      size = 2.6,
+      lineheight = 0.9
+    ) +
+    geom_rect(
+      data = header_data,
+      aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = "#F0F0F0",
+      colour = "white",
+      linewidth = 0.4,
+      inherit.aes = FALSE
+    ) +
+    geom_text(
+      data = header_data,
+      aes(x = x_mid, y = (ymin + ymax) / 2, label = label),
+      size = 2.6,
+      fontface = "bold",
+      lineheight = 0.9,
+      inherit.aes = FALSE
+    ) +
+    scale_fill_identity() +
+    scale_colour_identity() +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    theme_void() +
+    theme(plot.margin = margin(6, 6, 6, 6))
+}
