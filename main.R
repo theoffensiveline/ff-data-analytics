@@ -22,7 +22,7 @@ library(rcartocolor)
 league_id <- 1382521746292219904 # main league
 sleeper_players_csv <- "sleeper_players.csv"
 NFL_state <- get_sport_state('nfl')
-current_week <- 1 #NFL_state$display_week
+current_week <- 2 #NFL_state$display_week
 current_year <- 26
 
 # team photos
@@ -268,7 +268,7 @@ for (col in columns_to_process) {
 
   # Determine direction based on column name if needed
   direction <- if (col %in% c("NPG")) 1 else -1  # Example direction logic
-  danger_table[[color_col_name]] <- spec_color2_scale(danger_table[[col]],
+  danger_table[[color_col_name]] <- offensiveline:::spec_color2_scale(danger_table[[col]],
                                                       scale_from = c(min_val, max_val),
                                                       direction = direction)
 }

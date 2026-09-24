@@ -6,8 +6,8 @@ import os
 os.environ["PATH"] += os.pathsep + '/opt/homebrew/bin'
 
 CURRENT_YEAR = 26
-CURRENT_WEEK = 2
-CURRENT_CHAMPION = "Free DevDawg3 & J. Jacobs"
+CURRENT_WEEK = 3
+CURRENT_CHAMPION = "TikTok Team"
 matchups = [['Week', 'Champion', 'Opponent']]
 
 
